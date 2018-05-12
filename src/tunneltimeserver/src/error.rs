@@ -1,4 +1,5 @@
 use hyper;
+use postgres;
 use serde_json;
 use std::io;
 
@@ -8,6 +9,8 @@ pub enum Error {
     IO(io::Error),
     HyperURI(hyper::error::UriError),
     Hyper(hyper::Error),
+    Postgres(postgres::error::Error),
+    SelectManyOnOne(String),
 }
 
 impl From<serde_json::Error> for Error {
@@ -31,5 +34,11 @@ impl From<hyper::Error> for Error {
 impl From<hyper::error::UriError> for Error {
     fn from(error: hyper::error::UriError) -> Self {
         Error::HyperURI(error)
+    }
+}
+
+impl From<postgres::error::Error> for Error {
+    fn from(error: postgres::error::Error) -> Self {
+        Error::Postgres(error)
     }
 }

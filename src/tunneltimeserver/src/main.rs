@@ -1,3 +1,4 @@
+extern crate postgres;
 extern crate serde;
 extern crate serde_json;
 
@@ -8,6 +9,7 @@ extern crate tunneltimecore;
 
 use std::net;
 
+mod datastore;
 mod error;
 mod server;
 
