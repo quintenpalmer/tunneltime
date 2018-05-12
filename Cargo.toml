@@ -1,4 +1,6 @@
 [workspace]
 members = [
   "src/tunneltimecore/",
+  "src/tunneltimeclient/",
+  "src/tunneltimeserver/",
 ]
