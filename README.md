@@ -5,3 +5,13 @@ will be centered around dwarves digging for
 resources and using those resources to improve
 their tools and general capacity to dig more
 resources.
+
+# Installation
+
+Install `rust` and `cargo` from your package
+manager or from rustup:
+
+https://github.com/rust-lang-nursery/rustup.rs/#other-installation-methods
+
+I don't dig the curl into bash, use your
+discretion if you do follow that path.
