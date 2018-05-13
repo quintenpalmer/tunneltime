@@ -15,3 +15,12 @@ https://github.com/rust-lang-nursery/rustup.rs/#other-installation-methods
 
 I don't dig the curl into bash, use your
 discretion if you do follow that path.
+
+# Running
+
+From the root of this project, you can run the
+server and the client as follows:
+
+> cargo run --manifest-path src/tunneltimeserver/Cargo.toml
+
+> cargo run --manifest-path src/tunneltimeclient/Cargo.toml
