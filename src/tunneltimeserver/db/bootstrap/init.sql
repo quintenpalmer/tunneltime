@@ -1,0 +1,11 @@
+INSERT INTO towns (user_id) VALUES (1);
+INSERT INTO gem_shops (town_id) VALUES (1);
+INSERT INTO gem_types (name) VALUES ('ruby');
+INSERT INTO gem_types (name) VALUES ('sapphire');
+INSERT INTO gem_types (name) VALUES ('emerald');
+INSERT INTO gems (gem_type_id, size) VALUES (1, 10);
+INSERT INTO gems (gem_type_id, size) VALUES (2, 10);
+INSERT INTO gems (gem_type_id, size) VALUES (3, 10);
+INSERT INTO gem_shop_gems (gem_shop_id, gem_id) VALUES (1, 1);
+INSERT INTO gem_shop_gems (gem_shop_id, gem_id) VALUES (1, 2);
+INSERT INTO gem_shop_gems (gem_shop_id, gem_id) VALUES (1, 3);

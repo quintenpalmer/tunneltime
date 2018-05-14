@@ -1,0 +1,11 @@
+[package]
+name = "postgres_extra_derive"
+version = "0.1.0"
+authors = ["Quinten Palmer <quintenpalmer@gmail.com>"]
+
+[dependencies]
+syn = "0.13"
+quote = "0.5"
+
+[lib]
+proc-macro = true

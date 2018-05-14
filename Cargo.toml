@@ -3,4 +3,6 @@ members = [
   "src/tunneltimecore/",
   "src/tunneltimeclient/",
   "src/tunneltimeserver/",
+  "src/postgres_extra/",
+  "src/postgres_extra_derive/",
 ]
