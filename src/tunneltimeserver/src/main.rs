@@ -7,6 +7,10 @@ extern crate hyper;
 
 extern crate tunneltimecore;
 
+extern crate postgres_extra;
+#[macro_use]
+extern crate postgres_extra_derive;
+
 use std::net;
 
 mod datastore;

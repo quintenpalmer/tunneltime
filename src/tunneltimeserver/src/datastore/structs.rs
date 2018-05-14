@@ -1,12 +1,12 @@
 // Composite Structs
-#[derive(Debug)]
+#[derive(Debug, FromRow)]
 pub struct TownPlus {
     pub town_id: i32,
     pub user_id: i32,
     pub gem_shop_id: Option<i32>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, FromRow)]
 pub struct GemPlus {
     pub gem_id: i32,
     pub size: i32,

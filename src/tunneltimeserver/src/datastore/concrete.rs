@@ -1,4 +1,5 @@
 use postgres;
+use postgres_extra;
 
 use tunneltimecore::models;
 
@@ -28,40 +29,58 @@ impl Datastore {
     }
 
     pub fn get_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
-        let town = {
-            let raw_rows = self.conn.query(queries::TOWN_BY_USER_ID_SQL, &[&user_id])?;
-            let rows: Vec<postgres::rows::Row> = raw_rows.into_iter().collect();
-            let town = match rows.as_slice() {
-                [row] => Ok(structs::TownPlus {
-                    town_id: row.get(0),
-                    user_id: row.get(1),
-                    gem_shop_id: row.get(2),
-                }),
-                _ => Err(error::Error::SelectManyOnOne("towns".to_string())),
-            }?;
-            town
-        };
+        let town: structs::TownPlus = select_one_by_field(
+            self,
+            "towns".to_string(),
+            queries::TOWN_BY_USER_ID_SQL,
+            user_id,
+        )?;
         let gems = {
             match town.gem_shop_id {
                 Some(gem_shop_id) => {
-                    let mut gems = Vec::new();
-                    for row in self.conn
-                        .query(queries::GEMS_BY_GEM_SHOP_ID_SQL, &[&gem_shop_id])?
-                        .iter()
-                    {
-                        gems.push(structs::GemPlus {
-                            gem_id: row.get(0),
-                            size: row.get(1),
-                            gem_type_name: row.get(2),
-                        });
-                    }
-                    gems
+                    select_by_field(self, queries::GEMS_BY_GEM_SHOP_ID_SQL, gem_shop_id)?
                 }
                 None => Vec::new(),
             }
         };
         Ok(town.into_model(gems))
     }
+}
+
+pub fn select_one_by_field<T, F>(
+    ds: &Datastore,
+    name: String,
+    query: &'static str,
+    id: F,
+) -> Result<T, error::Error>
+where
+    T: postgres_extra::FromRow,
+    F: postgres::types::ToSql,
+{
+    let rows = ds.conn.query(query, &[&id])?;
+    if rows.len() != 1 {
+        return Err(error::Error::SelectManyOnOne(name));
+    }
+    let row = rows.get(0);
+    let ret = T::parse_row(row)?;
+    Ok(ret)
+}
+
+pub fn select_by_field<T, F>(
+    ds: &Datastore,
+    query: &'static str,
+    id: F,
+) -> Result<Vec<T>, error::Error>
+where
+    T: postgres_extra::FromRow,
+    F: postgres::types::ToSql,
+{
+    let rows = ds.conn.query(query, &[&id])?;
+    let mut ret = Vec::new();
+    for row in rows.iter() {
+        ret.push(T::parse_row(row)?);
+    }
+    return Ok(ret);
 }
 
 impl structs::TownPlus {
