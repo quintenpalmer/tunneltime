@@ -53,6 +53,7 @@ fn five_hundred<T: fmt::Debug>(err: T) -> Box<Future<Item = Response, Error = hy
     println!("{:?}", err);
     Box::new(futures::future::ok(
         Response::new()
+            .with_status(hyper::StatusCode::InternalServerError)
             .with_header(ContentLength(ISE.len() as u64))
             .with_body(ISE),
     ))
