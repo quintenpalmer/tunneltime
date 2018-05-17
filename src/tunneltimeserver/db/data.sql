@@ -16,6 +16,23 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Data for Name: dwarves; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.dwarves (id, town_id, name) FROM stdin;
+1	1	Idrigoth
+2	1	Magni
+\.
+
+
+--
+-- Name: dwarves_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.dwarves_id_seq', 2, true);
+
+
+--
 -- Data for Name: towns; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
 --
 
