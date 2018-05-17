@@ -45,6 +45,12 @@ impl Datastore {
         };
         Ok(town.into_model(gems))
     }
+
+    pub fn get_dwarves(&self, town_id: i32) -> Result<Vec<models::Dwarf>, error::Error> {
+        let dwarves: Vec<structs::Dwarf> =
+            select_by_field(self, queries::DWARVES_BY_TOWN_ID, town_id)?;
+        Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
+    }
 }
 
 pub fn select_one_by_field<T, F>(
@@ -109,5 +115,11 @@ impl structs::GemPlus {
             },
             size: self.size as u32,
         }
+    }
+}
+
+impl structs::Dwarf {
+    fn into_model(self) -> models::Dwarf {
+        models::Dwarf { name: self.name }
     }
 }

@@ -25,3 +25,14 @@ pub static GEMS_BY_GEM_SHOP_ID_SQL: &'static str = r#"
     WHERE
         gem_shop_gems.gem_shop_id = $1
 "#;
+
+pub static DWARVES_BY_TOWN_ID: &'static str = r#"
+	SELECT
+        dwarves.id,
+        dwarves.town_id,
+        dwarves.name
+    FROM
+        dwarves
+    WHERE
+        dwarves.town_id = $1
+"#;
