@@ -15,7 +15,7 @@ use std::net;
 
 mod datastore;
 mod error;
-mod server;
+mod web;
 
 fn main() {
     match run_app() {
@@ -27,7 +27,7 @@ fn main() {
 fn run_app() -> Result<(), error::Error> {
     let port = 5269;
     let addr = net::SocketAddr::new(net::IpAddr::V4(net::Ipv4Addr::new(127, 0, 0, 1)), port);
-    let server = hyper::server::Http::new().bind(&addr, || Ok(server::Handler {}))?;
+    let server = hyper::server::Http::new().bind(&addr, || Ok(web::Handler {}))?;
     println!("running on port: {}", port);
     server.run()?;
     Ok(())
