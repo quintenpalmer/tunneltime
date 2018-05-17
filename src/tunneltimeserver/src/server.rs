@@ -13,11 +13,13 @@ use datastore;
 
 pub struct Handler;
 
+type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
+
 impl Service for Handler {
     type Request = Request;
     type Response = Response;
     type Error = hyper::Error;
-    type Future = Box<Future<Item = Self::Response, Error = Self::Error>>;
+    type Future = ResponseFuture;
 
     fn call(&self, _req: Request) -> Self::Future {
         let conn = match datastore::Datastore::new(
@@ -49,7 +51,7 @@ impl Service for Handler {
 
 const ISE: &'static str = "Internal Server Error";
 
-fn five_hundred<T: fmt::Debug>(err: T) -> Box<Future<Item = Response, Error = hyper::Error>> {
+fn five_hundred<T: fmt::Debug>(err: T) -> ResponseFuture {
     println!("{:?}", err);
     Box::new(futures::future::ok(
         Response::new()
