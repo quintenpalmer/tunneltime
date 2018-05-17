@@ -4,24 +4,22 @@ use hyper;
 use serde_json;
 
 use futures;
-use futures::future::Future;
 
 use hyper::header::ContentLength;
 use hyper::server::{Request, Response, Service};
 
 use error;
+use web::types;
 
 use datastore;
 
 pub struct Handler;
 
-type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
-
 impl Service for Handler {
     type Request = Request;
     type Response = Response;
     type Error = hyper::Error;
-    type Future = ResponseFuture;
+    type Future = types::ResponseFuture;
 
     fn call(&self, req: Request) -> Self::Future {
         let conn = match datastore::Datastore::new(
@@ -58,7 +56,7 @@ fn handle_town(_req: &Request, ds: &datastore::Datastore) -> Result<String, erro
 const ISE: &'static str = "Internal Server Error";
 const ROUTE_NOT_FOUND: &'static str = "Route Not Found";
 
-fn five_hundred<T: fmt::Debug>(err: T) -> ResponseFuture {
+fn five_hundred<T: fmt::Debug>(err: T) -> types::ResponseFuture {
     println!("{:?}", err);
     Box::new(futures::future::ok(
         Response::new()
@@ -68,7 +66,7 @@ fn five_hundred<T: fmt::Debug>(err: T) -> ResponseFuture {
     ))
 }
 
-fn path_not_found(path: &str) -> ResponseFuture {
+fn path_not_found(path: &str) -> types::ResponseFuture {
     println!("{:?}", path);
     Box::new(futures::future::ok(
         Response::new()
