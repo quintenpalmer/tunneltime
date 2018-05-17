@@ -28,6 +28,7 @@ impl Service for Handler {
             None,
         ));
         let body = match req.uri().path() {
+            "/health" => isetry!(handle_health()),
             "/api/towns" => isetry!(handle_town(&req, &conn)),
             _ => return path_not_found(req.uri().path()),
         };
@@ -37,6 +38,11 @@ impl Service for Handler {
                 .with_body(body),
         ))
     }
+}
+
+fn handle_health() -> Result<String, error::Error> {
+    let res = serde_json::to_string(&serde_json::Value::Object(serde_json::Map::new()))?;
+    Ok(res)
 }
 
 fn handle_town(_req: &Request, ds: &datastore::Datastore) -> Result<String, error::Error> {
