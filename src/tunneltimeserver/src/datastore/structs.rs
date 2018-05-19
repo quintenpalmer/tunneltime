@@ -17,6 +17,12 @@ pub struct GemPlus {
 // Raw Structs
 
 #[derive(Debug, FromRow)]
+pub struct User {
+    pub id: i32,
+    pub user_name: String,
+}
+
+#[derive(Debug, FromRow)]
 pub struct Dwarf {
     pub id: i32,
     pub town_id: i32,

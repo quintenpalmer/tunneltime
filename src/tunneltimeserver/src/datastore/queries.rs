@@ -37,3 +37,20 @@ pub static DWARVES_BY_TOWN_ID: &'static str = r#"
     WHERE
         dwarves.town_id = $1
 "#;
+
+pub static INSERT_USER: &'static str = r#"
+    INSERT INTO
+        users (user_name)
+    VALUES
+        ($1)
+"#;
+
+pub static USER_BY_USER_NAME: &'static str = r#"
+    SELECT
+        users.id,
+        users.user_name
+    FROM
+        users
+    WHERE
+        users.user_name = $1
+"#;

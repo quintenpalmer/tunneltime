@@ -214,6 +214,39 @@ ALTER SEQUENCE public.towns_id_seq OWNED BY public.towns.id;
 
 
 --
+-- Name: users; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    user_name text NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO tunneltime_user;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE SEQUENCE public.users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO tunneltime_user;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: tunneltime_user
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
 -- Name: dwarves id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
 --
 
@@ -246,6 +279,13 @@ ALTER TABLE ONLY public.gems ALTER COLUMN id SET DEFAULT nextval('public.gems_id
 --
 
 ALTER TABLE ONLY public.towns ALTER COLUMN id SET DEFAULT nextval('public.towns_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
@@ -305,6 +345,22 @@ ALTER TABLE ONLY public.towns
 
 
 --
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_user_name_key; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_user_name_key UNIQUE (user_name);
+
+
+--
 -- Name: gem_shop_gems gem_shop_gems_gem_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
 --
 
@@ -334,6 +390,14 @@ ALTER TABLE ONLY public.gem_shops
 
 ALTER TABLE ONLY public.gems
     ADD CONSTRAINT gems_gem_type_id_fkey FOREIGN KEY (gem_type_id) REFERENCES public.gem_types(id);
+
+
+--
+-- Name: towns towns_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.towns
+    ADD CONSTRAINT towns_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

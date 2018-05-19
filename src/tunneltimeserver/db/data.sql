@@ -33,6 +33,15 @@ SELECT pg_catalog.setval('public.dwarves_id_seq', 2, true);
 
 
 --
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.users (id, user_name) FROM stdin;
+1	postprompt
+\.
+
+
+--
 -- Data for Name: towns; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
 --
 
@@ -109,6 +118,13 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 --
 
 SELECT pg_catalog.setval('public.towns_id_seq', 1, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 1, true);
 
 
 --
