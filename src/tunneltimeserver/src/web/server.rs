@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::io;
 
 use hyper;
@@ -9,6 +10,7 @@ use futures::{Future, Stream};
 
 use hyper::header::ContentLength;
 use hyper::server::{Request, Response, Service};
+use url;
 
 use tunneltimecore::models;
 
@@ -51,9 +53,17 @@ fn handle_health() -> types::ResponseFuture {
     build_response(&serde_json::Value::Object(serde_json::Map::new()))
 }
 
-fn handle_user_get(_req: Request, ds: &datastore::Datastore) -> types::ResponseFuture {
-    let user = isetry!(ds.get_user("postprompt".to_string()));
-    build_response(user)
+fn handle_user_get(req: Request, ds: &datastore::Datastore) -> types::ResponseFuture {
+    let params = url::form_urlencoded::parse(req.query().unwrap_or("").as_bytes())
+        .into_owned()
+        .collect::<HashMap<String, String>>();
+    match params.get("user_name") {
+        Some(user_name) => {
+            let user = isetry!(ds.get_user(user_name.to_string()));
+            build_response(user)
+        }
+        None => bad_request("missing user_name"),
+    }
 }
 
 fn handle_user_post(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
@@ -104,5 +114,17 @@ fn method_not_allowed(method: &hyper::Method) -> types::ResponseFuture {
             .with_status(hyper::StatusCode::MethodNotAllowed)
             .with_header(ContentLength(METHOD_NOT_ALLOWED.len() as u64))
             .with_body(METHOD_NOT_ALLOWED),
+    ))
+}
+
+const BAD_REQUEST: &'static str = "Bad Request";
+
+fn bad_request(message: &str) -> types::ResponseFuture {
+    println!("{}", message);
+    Box::new(futures::future::ok(
+        Response::new()
+            .with_status(hyper::StatusCode::BadRequest)
+            .with_header(ContentLength(BAD_REQUEST.len() as u64))
+            .with_body(BAD_REQUEST),
     ))
 }
