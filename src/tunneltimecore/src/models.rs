@@ -4,26 +4,6 @@ pub struct Town {
     pub gold: i32,
 }
 
-impl Town {
-    pub fn new() -> Town {
-        Town {
-            gem_shop: None,
-            gold: 0,
-        }
-    }
-
-    pub fn acquire_gem_shop(&mut self) {
-        self.gem_shop = Some(GemShop {
-            gems: vec![
-                Gem {
-                    type_: GemType::Ruby,
-                    size: 1,
-                },
-            ],
-        });
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GemShop {
     pub gems: Vec<Gem>,
