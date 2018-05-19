@@ -14,6 +14,14 @@ pub struct GemPlus {
 }
 
 // Raw Structs
+
+#[derive(Debug, FromRow)]
+pub struct Dwarf {
+    pub id: i32,
+    pub town_id: i32,
+    pub name: String,
+}
+
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Town {

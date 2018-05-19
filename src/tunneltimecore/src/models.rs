@@ -37,3 +37,8 @@ pub enum GemType {
     Sapphire,
     Emerald,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Dwarf {
+    pub name: String,
+}

@@ -34,6 +34,40 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: dwarves; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.dwarves (
+    id integer NOT NULL,
+    town_id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE public.dwarves OWNER TO tunneltime_user;
+
+--
+-- Name: dwarves_id_seq; Type: SEQUENCE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE SEQUENCE public.dwarves_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.dwarves_id_seq OWNER TO tunneltime_user;
+
+--
+-- Name: dwarves_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: tunneltime_user
+--
+
+ALTER SEQUENCE public.dwarves_id_seq OWNED BY public.dwarves.id;
+
+
+--
 -- Name: gem_shop_gems; Type: TABLE; Schema: public; Owner: tunneltime_user
 --
 
@@ -179,6 +213,13 @@ ALTER SEQUENCE public.towns_id_seq OWNED BY public.towns.id;
 
 
 --
+-- Name: dwarves id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.dwarves ALTER COLUMN id SET DEFAULT nextval('public.dwarves_id_seq'::regclass);
+
+
+--
 -- Name: gem_shops id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
 --
 
@@ -204,6 +245,14 @@ ALTER TABLE ONLY public.gems ALTER COLUMN id SET DEFAULT nextval('public.gems_id
 --
 
 ALTER TABLE ONLY public.towns ALTER COLUMN id SET DEFAULT nextval('public.towns_id_seq'::regclass);
+
+
+--
+-- Name: dwarves dwarves_pkey; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.dwarves
+    ADD CONSTRAINT dwarves_pkey PRIMARY KEY (id);
 
 
 --

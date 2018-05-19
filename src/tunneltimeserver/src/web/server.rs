@@ -30,6 +30,7 @@ impl Service for Handler {
         let body = match req.uri().path() {
             "/health" => isetry!(handle_health()),
             "/api/towns" => isetry!(handle_town(&req, &conn)),
+            "/api/dwarves" => isetry!(handle_dwarves(&req, &conn)),
             _ => return path_not_found(req.uri().path()),
         };
         Box::new(futures::future::ok(
@@ -47,6 +48,12 @@ fn handle_health() -> Result<String, error::Error> {
 
 fn handle_town(_req: &Request, ds: &datastore::Datastore) -> Result<String, error::Error> {
     let serializable = ds.get_town(1)?;
+    let res = serde_json::to_string(&serializable)?;
+    Ok(res)
+}
+
+fn handle_dwarves(_req: &Request, ds: &datastore::Datastore) -> Result<String, error::Error> {
+    let serializable = ds.get_dwarves(1)?;
     let res = serde_json::to_string(&serializable)?;
     Ok(res)
 }
