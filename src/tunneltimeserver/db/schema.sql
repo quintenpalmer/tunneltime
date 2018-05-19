@@ -185,7 +185,8 @@ ALTER SEQUENCE public.gems_id_seq OWNED BY public.gems.id;
 
 CREATE TABLE public.towns (
     id integer NOT NULL,
-    user_id integer NOT NULL
+    user_id integer NOT NULL,
+    gold integer
 );
 
 

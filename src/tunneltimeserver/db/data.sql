@@ -36,8 +36,8 @@ SELECT pg_catalog.setval('public.dwarves_id_seq', 2, true);
 -- Data for Name: towns; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
 --
 
-COPY public.towns (id, user_id) FROM stdin;
-1	1
+COPY public.towns (id, user_id, gold) FROM stdin;
+1	1	\N
 \.
 
 

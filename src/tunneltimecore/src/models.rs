@@ -1,11 +1,15 @@
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Town {
     pub gem_shop: Option<GemShop>,
+    pub gold: Option<i32>,
 }
 
 impl Town {
     pub fn new() -> Town {
-        Town { gem_shop: None }
+        Town {
+            gem_shop: None,
+            gold: Some(0),
+        }
     }
 
     pub fn acquire_gem_shop(&mut self) {
