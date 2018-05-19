@@ -52,8 +52,7 @@ impl Datastore {
         Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
     }
 
-    pub fn new_user(&self, user_name: String) -> Result<models::User, error::Error> {
-        let _ = self.conn.execute(queries::INSERT_USER, &[&user_name])?;
+    pub fn get_user(&self, user_name: String) -> Result<models::User, error::Error> {
         let user: structs::User = select_one_by_field(
             self,
             "users".to_string(),
@@ -61,6 +60,11 @@ impl Datastore {
             user_name,
         )?;
         Ok(user.into_model())
+    }
+
+    pub fn new_user(&self, user_name: String) -> Result<models::User, error::Error> {
+        let _ = self.conn.execute(queries::INSERT_USER, &[&user_name])?;
+        self.get_user(user_name)
     }
 }
 

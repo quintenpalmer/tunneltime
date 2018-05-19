@@ -31,6 +31,7 @@ impl Service for Handler {
         let resp = match req.uri().path() {
             "/health" => isetry!(handle_health()),
             "/api/users" => match req.method() {
+                hyper::Method::Get => isetry!(handle_user_get(req, &conn)),
                 hyper::Method::Post => isetry!(handle_user_post(req, &conn)),
                 _ => return method_not_allowed(req.method()),
             },
@@ -44,6 +45,14 @@ impl Service for Handler {
 
 fn handle_health() -> Result<types::ResponseFuture, error::Error> {
     build_response(&serde_json::Value::Object(serde_json::Map::new()))
+}
+
+fn handle_user_get(
+    _req: Request,
+    ds: &datastore::Datastore,
+) -> Result<types::ResponseFuture, error::Error> {
+    let user = ds.get_user("postprompt".to_string())?;
+    build_response(user)
 }
 
 fn handle_user_post(
