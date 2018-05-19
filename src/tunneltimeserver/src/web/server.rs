@@ -30,6 +30,10 @@ impl Service for Handler {
         ));
         let resp = match req.uri().path() {
             "/health" => isetry!(handle_health()),
+            "/api/users" => match req.method() {
+                hyper::Method::Post => isetry!(handle_user_post(req, &conn)),
+                _ => return method_not_allowed(req.method()),
+            },
             "/api/towns" => isetry!(handle_town(&req, &conn)),
             "/api/dwarves" => isetry!(handle_dwarves(&req, &conn)),
             _ => return path_not_found(req.uri().path()),
@@ -40,6 +44,14 @@ impl Service for Handler {
 
 fn handle_health() -> Result<types::ResponseFuture, error::Error> {
     build_response(&serde_json::Value::Object(serde_json::Map::new()))
+}
+
+fn handle_user_post(
+    _req: Request,
+    ds: &datastore::Datastore,
+) -> Result<types::ResponseFuture, error::Error> {
+    let user = ds.new_user("postprompt".to_string())?;
+    build_response(user)
 }
 
 fn handle_town(
@@ -74,5 +86,17 @@ fn path_not_found(path: &str) -> types::ResponseFuture {
             .with_status(hyper::StatusCode::NotFound)
             .with_header(ContentLength(ROUTE_NOT_FOUND.len() as u64))
             .with_body(ROUTE_NOT_FOUND),
+    ))
+}
+
+const METHOD_NOT_ALLOWED: &'static str = "Method Not Allowed";
+
+fn method_not_allowed(method: &hyper::Method) -> types::ResponseFuture {
+    println!("{}", method);
+    Box::new(futures::future::ok(
+        Response::new()
+            .with_status(hyper::StatusCode::MethodNotAllowed)
+            .with_header(ContentLength(METHOD_NOT_ALLOWED.len() as u64))
+            .with_body(METHOD_NOT_ALLOWED),
     ))
 }
