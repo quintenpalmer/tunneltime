@@ -2,6 +2,7 @@ pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
     SELECT
         towns.id as town_id,
         towns.user_id,
+        towns.gold,
         gem_shops.id as gem_shop_id
     FROM
         towns

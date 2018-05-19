@@ -1,4 +1,4 @@
-INSERT INTO towns (user_id) VALUES (1);
+INSERT INTO towns (user_id, gold) VALUES (1, 100);
 INSERT INTO gem_shops (town_id) VALUES (1);
 INSERT INTO gem_types (name) VALUES ('ruby');
 INSERT INTO gem_types (name) VALUES ('sapphire');

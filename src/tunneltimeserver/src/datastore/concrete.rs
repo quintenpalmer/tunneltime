@@ -100,7 +100,10 @@ impl structs::TownPlus {
             }
             None => None,
         };
-        models::Town { gem_shop: gem_shop }
+        models::Town {
+            gem_shop: gem_shop,
+            gold: self.gold,
+        }
     }
 }
 

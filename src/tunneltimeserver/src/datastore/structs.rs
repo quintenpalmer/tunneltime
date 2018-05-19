@@ -3,6 +3,7 @@
 pub struct TownPlus {
     pub town_id: i32,
     pub user_id: i32,
+    pub gold: i32,
     pub gem_shop_id: Option<i32>,
 }
 
