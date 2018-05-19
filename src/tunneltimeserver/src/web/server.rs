@@ -1,4 +1,5 @@
 use hyper;
+use serde;
 use serde_json;
 
 use futures;
@@ -27,35 +28,41 @@ impl Service for Handler {
             "tunneltime_user",
             None,
         ));
-        let body = match req.uri().path() {
+        let resp = match req.uri().path() {
             "/health" => isetry!(handle_health()),
             "/api/towns" => isetry!(handle_town(&req, &conn)),
             "/api/dwarves" => isetry!(handle_dwarves(&req, &conn)),
             _ => return path_not_found(req.uri().path()),
         };
-        Box::new(futures::future::ok(
-            Response::new()
-                .with_header(ContentLength(body.len() as u64))
-                .with_body(body),
-        ))
+        resp
     }
 }
 
-fn handle_health() -> Result<String, error::Error> {
-    let res = serde_json::to_string(&serde_json::Value::Object(serde_json::Map::new()))?;
-    Ok(res)
+fn handle_health() -> Result<types::ResponseFuture, error::Error> {
+    build_response(&serde_json::Value::Object(serde_json::Map::new()))
 }
 
-fn handle_town(_req: &Request, ds: &datastore::Datastore) -> Result<String, error::Error> {
-    let serializable = ds.get_town(1)?;
-    let res = serde_json::to_string(&serializable)?;
-    Ok(res)
+fn handle_town(
+    _req: &Request,
+    ds: &datastore::Datastore,
+) -> Result<types::ResponseFuture, error::Error> {
+    build_response(ds.get_town(1)?)
 }
 
-fn handle_dwarves(_req: &Request, ds: &datastore::Datastore) -> Result<String, error::Error> {
-    let serializable = ds.get_dwarves(1)?;
-    let res = serde_json::to_string(&serializable)?;
-    Ok(res)
+fn handle_dwarves(
+    _req: &Request,
+    ds: &datastore::Datastore,
+) -> Result<types::ResponseFuture, error::Error> {
+    build_response(ds.get_dwarves(1)?)
+}
+
+fn build_response<T: serde::Serialize>(ser: T) -> Result<types::ResponseFuture, error::Error> {
+    let body = serde_json::to_string(&ser)?;
+    Ok(Box::new(futures::future::ok(
+        Response::new()
+            .with_header(ContentLength(body.len() as u64))
+            .with_body(body),
+    )))
 }
 
 const ROUTE_NOT_FOUND: &'static str = "Route Not Found";
