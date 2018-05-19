@@ -393,6 +393,14 @@ ALTER TABLE ONLY public.gems
 
 
 --
+-- Name: towns towns_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.towns
+    ADD CONSTRAINT towns_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
