@@ -112,6 +112,21 @@ SELECT pg_catalog.setval('public.towns_id_seq', 1, true);
 
 
 --
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.users (id, user_name) FROM stdin;
+\.
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+
+
+--
 -- PostgreSQL database dump complete
 --
 

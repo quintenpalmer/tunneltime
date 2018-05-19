@@ -51,6 +51,17 @@ impl Datastore {
             select_by_field(self, queries::DWARVES_BY_TOWN_ID, town_id)?;
         Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
     }
+
+    pub fn new_user(&self, user_name: String) -> Result<models::User, error::Error> {
+        let _ = self.conn.execute(queries::INSERT_USER, &[&user_name])?;
+        let user: structs::User = select_one_by_field(
+            self,
+            "users".to_string(),
+            queries::USER_BY_USER_NAME,
+            user_name,
+        )?;
+        Ok(user.into_model())
+    }
 }
 
 pub fn select_one_by_field<T, F>(
@@ -124,5 +135,14 @@ impl structs::GemPlus {
 impl structs::Dwarf {
     fn into_model(self) -> models::Dwarf {
         models::Dwarf { name: self.name }
+    }
+}
+
+impl structs::User {
+    fn into_model(self) -> models::User {
+        models::User {
+            id: self.id,
+            user_name: self.user_name,
+        }
     }
 }
