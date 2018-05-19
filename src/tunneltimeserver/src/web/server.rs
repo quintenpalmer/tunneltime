@@ -1,11 +1,16 @@
+use std::io;
+
 use hyper;
 use serde;
 use serde_json;
 
 use futures;
+use futures::{Future, Stream};
 
 use hyper::header::ContentLength;
 use hyper::server::{Request, Response, Service};
+
+use tunneltimecore::models;
 
 use web::types;
 
@@ -31,7 +36,7 @@ impl Service for Handler {
             "/health" => handle_health(),
             "/api/users" => match req.method() {
                 hyper::Method::Get => handle_user_get(req, &conn),
-                hyper::Method::Post => handle_user_post(req, &conn),
+                hyper::Method::Post => handle_user_post(req, conn),
                 _ => return method_not_allowed(req.method()),
             },
             "/api/towns" => handle_town(&req, &conn),
@@ -51,9 +56,14 @@ fn handle_user_get(_req: Request, ds: &datastore::Datastore) -> types::ResponseF
     build_response(user)
 }
 
-fn handle_user_post(_req: Request, ds: &datastore::Datastore) -> types::ResponseFuture {
-    let user = isetry!(ds.new_user("postprompt".to_string()));
-    build_response(user)
+fn handle_user_post(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
+    Box::new(req.body().concat2().and_then(move |chunk| {
+        let v: models::NewUser = isetry!(
+            serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
+        );
+        let user = isetry!(ds.new_user(v.user_name));
+        build_response(user)
+    }))
 }
 
 fn handle_town(_req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
