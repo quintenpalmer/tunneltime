@@ -1,5 +1,6 @@
 use futures::{Future, Stream};
 use hyper;
+use serde;
 use serde_json;
 use std::io;
 use tokio_core::reactor::Core;
@@ -8,7 +9,10 @@ use error;
 use tunneltimecore::models;
 
 pub fn request_town() -> Result<models::Town, error::Error> {
-    let uri_str = "http://localhost:5269/api/towns";
+    return request("http://localhost:5269/api/towns");
+}
+
+fn request<T: serde::de::DeserializeOwned>(uri_str: &str) -> Result<T, error::Error> {
     let mut core = Core::new()?;
     let client = hyper::Client::new(&core.handle());
     let uri = uri_str.parse()?;
