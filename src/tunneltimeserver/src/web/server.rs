@@ -7,7 +7,6 @@ use futures;
 use hyper::header::ContentLength;
 use hyper::server::{Request, Response, Service};
 
-use error;
 use web::types;
 
 use datastore;
@@ -29,61 +28,49 @@ impl Service for Handler {
             None,
         ));
         let resp = match req.uri().path() {
-            "/health" => isetry!(handle_health()),
+            "/health" => handle_health(),
             "/api/users" => match req.method() {
-                hyper::Method::Get => isetry!(handle_user_get(req, &conn)),
-                hyper::Method::Post => isetry!(handle_user_post(req, &conn)),
+                hyper::Method::Get => handle_user_get(req, &conn),
+                hyper::Method::Post => handle_user_post(req, &conn),
                 _ => return method_not_allowed(req.method()),
             },
-            "/api/towns" => isetry!(handle_town(&req, &conn)),
-            "/api/dwarves" => isetry!(handle_dwarves(&req, &conn)),
+            "/api/towns" => handle_town(&req, &conn),
+            "/api/dwarves" => handle_dwarves(&req, &conn),
             _ => return path_not_found(req.uri().path()),
         };
         resp
     }
 }
 
-fn handle_health() -> Result<types::ResponseFuture, error::Error> {
+fn handle_health() -> types::ResponseFuture {
     build_response(&serde_json::Value::Object(serde_json::Map::new()))
 }
 
-fn handle_user_get(
-    _req: Request,
-    ds: &datastore::Datastore,
-) -> Result<types::ResponseFuture, error::Error> {
-    let user = ds.get_user("postprompt".to_string())?;
+fn handle_user_get(_req: Request, ds: &datastore::Datastore) -> types::ResponseFuture {
+    let user = isetry!(ds.get_user("postprompt".to_string()));
     build_response(user)
 }
 
-fn handle_user_post(
-    _req: Request,
-    ds: &datastore::Datastore,
-) -> Result<types::ResponseFuture, error::Error> {
-    let user = ds.new_user("postprompt".to_string())?;
+fn handle_user_post(_req: Request, ds: &datastore::Datastore) -> types::ResponseFuture {
+    let user = isetry!(ds.new_user("postprompt".to_string()));
     build_response(user)
 }
 
-fn handle_town(
-    _req: &Request,
-    ds: &datastore::Datastore,
-) -> Result<types::ResponseFuture, error::Error> {
-    build_response(ds.get_town(1)?)
+fn handle_town(_req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
+    build_response(isetry!(ds.get_town(1)))
 }
 
-fn handle_dwarves(
-    _req: &Request,
-    ds: &datastore::Datastore,
-) -> Result<types::ResponseFuture, error::Error> {
-    build_response(ds.get_dwarves(1)?)
+fn handle_dwarves(_req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
+    build_response(isetry!(ds.get_dwarves(1)))
 }
 
-fn build_response<T: serde::Serialize>(ser: T) -> Result<types::ResponseFuture, error::Error> {
-    let body = serde_json::to_string(&ser)?;
-    Ok(Box::new(futures::future::ok(
+fn build_response<T: serde::Serialize>(ser: T) -> types::ResponseFuture {
+    let body = isetry!(serde_json::to_string(&ser));
+    Box::new(futures::future::ok(
         Response::new()
             .with_header(ContentLength(body.len() as u64))
             .with_body(body),
-    )))
+    ))
 }
 
 const ROUTE_NOT_FOUND: &'static str = "Route Not Found";
