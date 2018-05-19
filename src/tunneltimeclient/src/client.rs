@@ -12,6 +12,10 @@ pub fn request_town() -> Result<models::Town, error::Error> {
     return request("http://localhost:5269/api/towns");
 }
 
+pub fn request_dwarves() -> Result<Vec<models::Dwarf>, error::Error> {
+    return request("http://localhost:5269/api/dwarves");
+}
+
 fn request<T: serde::de::DeserializeOwned>(uri_str: &str) -> Result<T, error::Error> {
     let mut core = Core::new()?;
     let client = hyper::Client::new(&core.handle());
