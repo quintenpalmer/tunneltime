@@ -1,14 +1,14 @@
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Town {
     pub gem_shop: Option<GemShop>,
-    pub gold: Option<i32>,
+    pub gold: i32,
 }
 
 impl Town {
     pub fn new() -> Town {
         Town {
             gem_shop: None,
-            gold: Some(0),
+            gold: 0,
         }
     }
 

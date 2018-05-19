@@ -37,7 +37,7 @@ SELECT pg_catalog.setval('public.dwarves_id_seq', 2, true);
 --
 
 COPY public.towns (id, user_id, gold) FROM stdin;
-1	1	\N
+1	1	100
 \.
 
 
