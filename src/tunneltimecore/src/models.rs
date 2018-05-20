@@ -22,6 +22,7 @@ pub struct NewUser {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Town {
+    pub id: i32,
     pub gem_shop: Option<GemShop>,
     pub gold: i32,
 }
@@ -33,6 +34,7 @@ pub struct GemShop {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Gem {
+    pub id: i32,
     pub type_: GemType,
     pub size: u32,
 }
@@ -46,5 +48,6 @@ pub enum GemType {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Dwarf {
+    pub id: i32,
     pub name: String,
 }

@@ -1,5 +1,5 @@
-use postgres;
-use postgres_extra;
+use postgres as pg;
+use postgres_extra as pg_extra;
 
 use tunneltimecore::models;
 
@@ -8,7 +8,7 @@ use datastore::structs;
 use error;
 
 pub struct Datastore {
-    conn: postgres::Connection,
+    conn: pg::Connection,
 }
 
 impl Datastore {
@@ -19,12 +19,12 @@ impl Datastore {
         username: &str,
         password: Option<&str>,
     ) -> Result<Datastore, error::Error> {
-        let connect_params = postgres::params::Builder::new()
+        let connect_params = pg::params::Builder::new()
             .database(dbname)
             .port(port)
             .user(username, password)
-            .build(postgres::params::Host::Tcp(host));
-        let conn = postgres::Connection::connect(connect_params, postgres::TlsMode::None)?;
+            .build(pg::params::Host::Tcp(host));
+        let conn = pg::Connection::connect(connect_params, pg::TlsMode::None)?;
         return Ok(Datastore { conn: conn });
     }
 
@@ -88,14 +88,14 @@ impl Datastore {
 }
 
 pub fn select_one_by_field<T, F>(
-    ds: &postgres::GenericConnection,
+    ds: &pg::GenericConnection,
     name: String,
     query: &'static str,
     id: F,
 ) -> Result<T, error::Error>
 where
-    T: postgres_extra::FromRow,
-    F: postgres::types::ToSql,
+    T: pg_extra::FromRow,
+    F: pg::types::ToSql,
 {
     let rows = ds.query(query, &[&id])?;
     if rows.len() != 1 {
@@ -107,13 +107,13 @@ where
 }
 
 pub fn select_by_field<T, F>(
-    ds: &postgres::GenericConnection,
+    ds: &pg::GenericConnection,
     query: &'static str,
     id: F,
 ) -> Result<Vec<T>, error::Error>
 where
-    T: postgres_extra::FromRow,
-    F: postgres::types::ToSql,
+    T: pg_extra::FromRow,
+    F: pg::types::ToSql,
 {
     let rows = ds.query(query, &[&id])?;
     let mut ret = Vec::new();
@@ -121,51 +121,4 @@ where
         ret.push(T::parse_row(row)?);
     }
     return Ok(ret);
-}
-
-impl structs::TownPlus {
-    fn into_model(self, gems: Vec<structs::GemPlus>) -> models::Town {
-        let gem_shop = match self.gem_shop_id {
-            Some(_) => {
-                let gem_shop_gems = gems.into_iter().map(|x| x.into_model()).collect();
-                Some(models::GemShop {
-                    gems: gem_shop_gems,
-                })
-            }
-            None => None,
-        };
-        models::Town {
-            gem_shop: gem_shop,
-            gold: self.gold,
-        }
-    }
-}
-
-impl structs::GemPlus {
-    fn into_model(self) -> models::Gem {
-        models::Gem {
-            type_: match self.gem_type_name.as_str() {
-                "emerald" => models::GemType::Emerald,
-                "ruby" => models::GemType::Ruby,
-                "sapphire" => models::GemType::Sapphire,
-                _ => panic!("unsupported gem type: {}", self.gem_type_name),
-            },
-            size: self.size as u32,
-        }
-    }
-}
-
-impl structs::Dwarf {
-    fn into_model(self) -> models::Dwarf {
-        models::Dwarf { name: self.name }
-    }
-}
-
-impl structs::User {
-    fn into_model(self) -> models::User {
-        models::User {
-            id: self.id,
-            user_name: self.user_name,
-        }
-    }
 }
