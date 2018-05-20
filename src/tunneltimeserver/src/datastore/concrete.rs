@@ -38,6 +38,7 @@ impl Datastore {
             user_id,
         )?;
         let _ = txn.execute(queries::INSERT_NEW_STORAGE_BUILDING, &[&simple_town.id])?;
+        let _ = txn.execute(queries::INSERT_NEW_MINE, &[&simple_town.id])?;
         txn.set_commit();
         return get_town(&txn, user_id);
     }

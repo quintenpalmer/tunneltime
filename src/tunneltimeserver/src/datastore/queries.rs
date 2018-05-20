@@ -106,6 +106,12 @@ pub static INSERT_NEW_STORAGE_BUILDING: &'static str = r#"
         ($1, 1, 0);
 "#;
 
+pub static INSERT_NEW_MINE: &'static str = r#"
+    INSERT INTO
+        mines (town_id, total_stone, stone_density)
+    VALUES ($1, 1000, 5);
+"#;
+
 pub static USER_BY_USER_NAME: &'static str = r#"
     SELECT
         users.id,
