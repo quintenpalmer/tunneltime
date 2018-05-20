@@ -4,6 +4,7 @@ extern crate serde_json;
 
 extern crate futures;
 extern crate hyper;
+extern crate url;
 
 extern crate tunneltimecore;
 
