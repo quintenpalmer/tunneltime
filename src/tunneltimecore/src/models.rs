@@ -9,6 +9,7 @@ pub struct Town {
     pub id: i32,
     pub gem_shop: Option<GemShop>,
     pub storage_building: StorageBuilding,
+    pub mine: Mine,
     pub gold: i32,
 }
 
@@ -23,6 +24,12 @@ pub struct StorageBuilding {
     pub level: i32,
     pub current_stone_count: i32,
     pub max_stone_count: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Mine {
+    pub total_stone: i32,
+    pub stone_density: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

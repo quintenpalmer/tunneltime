@@ -121,6 +121,25 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 
 
 --
+-- Data for Name: mines; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.mines (id, town_id, total_stone, stone_density) FROM stdin;
+1	1	1000	5
+2	2	1000	5
+3	3	1000	5
+4	4	1000	5
+\.
+
+
+--
+-- Name: mines_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.mines_id_seq', 4, true);
+
+
+--
 -- Data for Name: storage_building_levels; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
 --
 

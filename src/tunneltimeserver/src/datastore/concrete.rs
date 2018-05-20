@@ -38,6 +38,7 @@ impl Datastore {
             user_id,
         )?;
         let _ = txn.execute(queries::INSERT_NEW_STORAGE_BUILDING, &[&simple_town.id])?;
+        let _ = txn.execute(queries::INSERT_NEW_MINE, &[&simple_town.id])?;
         txn.set_commit();
         return get_town(&txn, user_id);
     }
@@ -97,5 +98,12 @@ fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, er
             None => Vec::new(),
         }
     };
-    Ok(town.into_model(gems))
+    let mine: structs::Mine = selects::select_one_by_field(
+        ds,
+        "mines".to_string(),
+        queries::MINES_BY_TOWN_ID,
+        town.town_id,
+    )?;
+
+    Ok(town.into_model(gems, mine))
 }

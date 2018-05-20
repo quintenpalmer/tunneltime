@@ -38,6 +38,18 @@ pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
         user_id = $1
 "#;
 
+pub static MINES_BY_TOWN_ID: &'static str = r#"
+    SELECT
+        mines.id,
+        mines.town_id,
+        mines.total_stone,
+        mines.stone_density
+    FROM
+        mines
+    WHERE
+        mines.town_id = $1
+"#;
+
 pub static UPDATE_TOWN_GOLD: &'static str = r#"
     UPDATE
         towns
@@ -92,6 +104,12 @@ pub static INSERT_NEW_STORAGE_BUILDING: &'static str = r#"
         storage_buildings (town_id, level, current_stone_count)
     VALUES
         ($1, 1, 0);
+"#;
+
+pub static INSERT_NEW_MINE: &'static str = r#"
+    INSERT INTO
+        mines (town_id, total_stone, stone_density)
+    VALUES ($1, 1000, 5);
 "#;
 
 pub static USER_BY_USER_NAME: &'static str = r#"

@@ -180,6 +180,43 @@ ALTER SEQUENCE public.gems_id_seq OWNED BY public.gems.id;
 
 
 --
+-- Name: mines; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.mines (
+    id integer NOT NULL,
+    town_id integer NOT NULL,
+    total_stone integer NOT NULL,
+    stone_density integer NOT NULL,
+    CONSTRAINT mines_stone_density_check CHECK ((stone_density > 0)),
+    CONSTRAINT mines_total_stone_check CHECK ((total_stone >= 0))
+);
+
+
+ALTER TABLE public.mines OWNER TO tunneltime_user;
+
+--
+-- Name: mines_id_seq; Type: SEQUENCE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE SEQUENCE public.mines_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mines_id_seq OWNER TO tunneltime_user;
+
+--
+-- Name: mines_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: tunneltime_user
+--
+
+ALTER SEQUENCE public.mines_id_seq OWNED BY public.mines.id;
+
+
+--
 -- Name: storage_building_levels; Type: TABLE; Schema: public; Owner: tunneltime_user
 --
 
@@ -325,6 +362,13 @@ ALTER TABLE ONLY public.gems ALTER COLUMN id SET DEFAULT nextval('public.gems_id
 
 
 --
+-- Name: mines id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.mines ALTER COLUMN id SET DEFAULT nextval('public.mines_id_seq'::regclass);
+
+
+--
 -- Name: storage_buildings id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
 --
 
@@ -391,6 +435,14 @@ ALTER TABLE ONLY public.gem_types
 
 ALTER TABLE ONLY public.gems
     ADD CONSTRAINT gems_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mines mines_pkey; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.mines
+    ADD CONSTRAINT mines_pkey PRIMARY KEY (id);
 
 
 --
@@ -471,6 +523,14 @@ ALTER TABLE ONLY public.gem_shops
 
 ALTER TABLE ONLY public.gems
     ADD CONSTRAINT gems_gem_type_id_fkey FOREIGN KEY (gem_type_id) REFERENCES public.gem_types(id);
+
+
+--
+-- Name: mines mines_town_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.mines
+    ADD CONSTRAINT mines_town_id_fkey FOREIGN KEY (town_id) REFERENCES public.towns(id);
 
 
 --
