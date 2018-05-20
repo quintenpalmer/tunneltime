@@ -51,6 +51,20 @@ impl Datastore {
         Ok(town.into_model(gems))
     }
 
+    pub fn recruit_dwarf(
+        &self,
+        town_id: i32,
+        dwarf_name: String,
+    ) -> Result<Vec<models::Dwarf>, error::Error> {
+        let txn = self.conn.transaction()?;
+        let _ = txn.execute(queries::INSERT_DWARF, &[&town_id, &dwarf_name])?;
+        let _ = txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id])?;
+        let dwarves: Vec<structs::Dwarf> =
+            select_by_field(&txn, queries::DWARVES_BY_TOWN_ID, town_id)?;
+        txn.set_commit();
+        Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
+    }
+
     pub fn get_dwarves(&self, town_id: i32) -> Result<Vec<models::Dwarf>, error::Error> {
         let dwarves: Vec<structs::Dwarf> =
             select_by_field(&self.conn, queries::DWARVES_BY_TOWN_ID, town_id)?;

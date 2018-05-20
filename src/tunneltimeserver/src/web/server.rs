@@ -52,6 +52,7 @@ impl Service for Handler {
             },
             "/api/dwarves" => match req.method() {
                 hyper::Method::Get => handle_dwarves(&req, &conn),
+                hyper::Method::Post => handle_dwarves_post(req, conn),
                 _ => return method_not_allowed(req.method()),
             },
             _ => return path_not_found(req.uri().path()),
@@ -98,6 +99,16 @@ fn handle_town_post(req: Request, ds: datastore::Datastore) -> types::ResponseFu
 fn handle_dwarves(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
     let town_id: i32 = rtry!(get_query_param(&req, "town_id"));
     build_response(isetry!(ds.get_dwarves(town_id)))
+}
+
+fn handle_dwarves_post(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
+    Box::new(req.body().concat2().and_then(move |chunk| {
+        let v: models::DwarfCreation = isetry!(
+            serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
+        );
+        let dwarf = isetry!(ds.recruit_dwarf(v.town_id, v.dwarf_name));
+        build_response(dwarf)
+    }))
 }
 
 fn get_query_param<T: FromStr>(req: &Request, name: &str) -> Result<T, types::ResponseFuture> {

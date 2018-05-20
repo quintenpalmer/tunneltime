@@ -4,6 +4,12 @@ pub struct UserID {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct DwarfCreation {
+    pub town_id: i32,
+    pub dwarf_name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: i32,
     pub user_name: String,

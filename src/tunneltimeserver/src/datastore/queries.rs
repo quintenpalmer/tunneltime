@@ -19,6 +19,15 @@ pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
         user_id = $1
 "#;
 
+pub static UPDATE_TOWN_GOLD: &'static str = r#"
+    UPDATE
+        towns
+    SET
+        gold=towns.gold-20
+    WHERE
+        id=$1
+"#;
+
 pub static GEMS_BY_GEM_SHOP_ID_SQL: &'static str = r#"
     SELECT
         gems.id as gem_id,
@@ -50,6 +59,13 @@ pub static INSERT_USER: &'static str = r#"
         users (user_name)
     VALUES
         ($1)
+"#;
+
+pub static INSERT_DWARF: &'static str = r#"
+    INSERT INTO
+        dwarves (town_id, name)
+    VALUES
+        ($1, $2)
 "#;
 
 pub static USER_BY_USER_NAME: &'static str = r#"
