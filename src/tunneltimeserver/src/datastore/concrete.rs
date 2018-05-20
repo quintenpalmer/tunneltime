@@ -34,23 +34,7 @@ impl Datastore {
     }
 
     pub fn get_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
-        let town: structs::TownPlus = selects::select_one_by_field(
-            &self.conn,
-            "towns".to_string(),
-            queries::TOWN_BY_USER_ID_SQL,
-            user_id,
-        )?;
-        let gems = {
-            match town.gem_shop_id {
-                Some(gem_shop_id) => selects::select_by_field(
-                    &self.conn,
-                    queries::GEMS_BY_GEM_SHOP_ID_SQL,
-                    gem_shop_id,
-                )?,
-                None => Vec::new(),
-            }
-        };
-        Ok(town.into_model(gems))
+        return get_town(&self.conn, user_id);
     }
 
     pub fn recruit_dwarf(
@@ -87,4 +71,22 @@ impl Datastore {
         let _ = self.conn.execute(queries::INSERT_USER, &[&user_name])?;
         self.get_user(user_name)
     }
+}
+
+fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, error::Error> {
+    let town: structs::TownPlus = selects::select_one_by_field(
+        ds,
+        "towns".to_string(),
+        queries::TOWN_BY_USER_ID_SQL,
+        user_id,
+    )?;
+    let gems = {
+        match town.gem_shop_id {
+            Some(gem_shop_id) => {
+                selects::select_by_field(ds, queries::GEMS_BY_GEM_SHOP_ID_SQL, gem_shop_id)?
+            }
+            None => Vec::new(),
+        }
+    };
+    Ok(town.into_model(gems))
 }
