@@ -28,6 +28,11 @@ impl Datastore {
         return Ok(Datastore { conn: conn });
     }
 
+    pub fn new_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
+        let _ = self.conn.execute(queries::INSERT_TOWN, &[&user_id])?;
+        self.get_town(user_id)
+    }
+
     pub fn get_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
         let town: structs::TownPlus = select_one_by_field(
             self,

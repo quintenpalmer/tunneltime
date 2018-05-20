@@ -1,4 +1,9 @@
 #[derive(Debug, Serialize, Deserialize)]
+pub struct UserID {
+    pub user_id: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: i32,
     pub user_name: String,
