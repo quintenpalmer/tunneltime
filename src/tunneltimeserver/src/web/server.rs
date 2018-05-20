@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io;
+use std::str::FromStr;
 
 use hyper;
 use serde;
@@ -54,16 +55,12 @@ fn handle_health() -> types::ResponseFuture {
 }
 
 fn handle_user_get(req: Request, ds: &datastore::Datastore) -> types::ResponseFuture {
-    let params = url::form_urlencoded::parse(req.query().unwrap_or("").as_bytes())
-        .into_owned()
-        .collect::<HashMap<String, String>>();
-    match params.get("user_name") {
-        Some(user_name) => {
-            let user = isetry!(ds.get_user(user_name.to_string()));
-            build_response(user)
-        }
-        None => bad_request("missing user_name"),
-    }
+    let user_name: String = match get_query_param(&req, "user_name") {
+        Ok(v) => v,
+        Err(resp) => return resp,
+    };
+    let user = isetry!(ds.get_user(user_name.to_string()));
+    build_response(user)
 }
 
 fn handle_user_post(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
@@ -82,6 +79,19 @@ fn handle_town(_req: &Request, ds: &datastore::Datastore) -> types::ResponseFutu
 
 fn handle_dwarves(_req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
     build_response(isetry!(ds.get_dwarves(1)))
+}
+
+fn get_query_param<T: FromStr>(req: &Request, name: &str) -> Result<T, types::ResponseFuture> {
+    let params = url::form_urlencoded::parse(req.query().unwrap_or("").as_bytes())
+        .into_owned()
+        .collect::<HashMap<String, String>>();
+    match params.get(name) {
+        Some(val) => match val.parse() {
+            Ok(v) => Ok(v),
+            Err(_) => Err(bad_request("missing user_name")),
+        },
+        None => Err(bad_request("missing user_name")),
+    }
 }
 
 fn build_response<T: serde::Serialize>(ser: T) -> types::ResponseFuture {
