@@ -135,6 +135,7 @@ impl structs::TownPlus {
             None => None,
         };
         models::Town {
+            id: self.town_id,
             gem_shop: gem_shop,
             gold: self.gold,
         }
@@ -144,6 +145,7 @@ impl structs::TownPlus {
 impl structs::GemPlus {
     fn into_model(self) -> models::Gem {
         models::Gem {
+            id: self.gem_id,
             type_: match self.gem_type_name.as_str() {
                 "emerald" => models::GemType::Emerald,
                 "ruby" => models::GemType::Ruby,
@@ -157,7 +159,10 @@ impl structs::GemPlus {
 
 impl structs::Dwarf {
     fn into_model(self) -> models::Dwarf {
-        models::Dwarf { name: self.name }
+        models::Dwarf {
+            id: self.id,
+            name: self.name,
+        }
     }
 }
 
