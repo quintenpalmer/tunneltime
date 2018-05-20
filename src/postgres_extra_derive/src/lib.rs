@@ -31,10 +31,10 @@ fn derive_from_row(ast: &syn::DeriveInput) -> quote::Tokens {
                 let field = field_syn.ident.as_ref().unwrap();
                 let field_str = format!("{}", field);
                 field_assignments.push(quote! { #field: row.get_opt(#field_str).ok_or(
-                    postgres_extra::Error::Extra(
-                        postgres_extra::ExtraError::ParseNonexistentField(#field_str.to_owned())
+                    ::postgres_extra::Error::Extra(
+                        ::postgres_extra::ExtraError::ParseNonexistentField(#field_str.to_owned())
                     ))?
-                .map_err(postgres_extra::Error::Postgres)? });
+                .map_err(::postgres_extra::Error::Postgres)? });
             }
             field_assignments
         }
@@ -50,7 +50,6 @@ fn derive_from_row(ast: &syn::DeriveInput) -> quote::Tokens {
     quote! {
         impl #impl_generics ::postgres_extra::FromRow for #name #ty_generics #where_clause {
             fn parse_row(row: ::postgres::rows::Row) -> Result<Self, ::postgres_extra::Error> {
-                use postgres_extra;
                 return Ok(#name { #(#field_assignments),* });
             }
         }
