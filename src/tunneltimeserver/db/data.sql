@@ -22,6 +22,7 @@ SET row_security = off;
 COPY public.dwarves (id, town_id, name) FROM stdin;
 1	1	Idrigoth
 2	1	Magni
+7	1	Prudent
 \.
 
 
@@ -29,7 +30,7 @@ COPY public.dwarves (id, town_id, name) FROM stdin;
 -- Name: dwarves_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.dwarves_id_seq', 2, true);
+SELECT pg_catalog.setval('public.dwarves_id_seq', 7, true);
 
 
 --
@@ -38,6 +39,8 @@ SELECT pg_catalog.setval('public.dwarves_id_seq', 2, true);
 
 COPY public.users (id, user_name) FROM stdin;
 1	postprompt
+2	other user
+3	qp
 \.
 
 
@@ -46,7 +49,9 @@ COPY public.users (id, user_name) FROM stdin;
 --
 
 COPY public.towns (id, user_id, gold) FROM stdin;
-1	1	100
+2	2	100
+3	3	100
+1	1	80
 \.
 
 
@@ -117,14 +122,14 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 -- Name: towns_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.towns_id_seq', 1, true);
+SELECT pg_catalog.setval('public.towns_id_seq', 3, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_id_seq', 3, true);
 
 
 --

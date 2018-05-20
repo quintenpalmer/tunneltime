@@ -186,7 +186,8 @@ ALTER SEQUENCE public.gems_id_seq OWNED BY public.gems.id;
 CREATE TABLE public.towns (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    gold integer NOT NULL
+    gold integer NOT NULL,
+    CONSTRAINT towns_gold_gt_zero CHECK ((gold >= 0))
 );
 
 
@@ -286,6 +287,14 @@ ALTER TABLE ONLY public.towns ALTER COLUMN id SET DEFAULT nextval('public.towns_
 --
 
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Name: dwarves dwarves_name_unique; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.dwarves
+    ADD CONSTRAINT dwarves_name_unique UNIQUE (town_id, name);
 
 
 --
