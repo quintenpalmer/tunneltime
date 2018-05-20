@@ -1,4 +1,9 @@
 #[derive(Debug, Serialize, Deserialize)]
+pub struct UserID {
+    pub user_id: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: i32,
     pub user_name: String,
@@ -8,6 +13,7 @@ pub struct User {
 pub struct NewUser {
     pub user_name: String,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Town {
     pub gem_shop: Option<GemShop>,

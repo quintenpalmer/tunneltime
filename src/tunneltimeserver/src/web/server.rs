@@ -36,14 +36,24 @@ impl Service for Handler {
             None,
         ));
         let resp = match req.uri().path() {
-            "/health" => handle_health(),
+            "/health" => match req.method() {
+                hyper::Method::Get => handle_health(),
+                _ => return method_not_allowed(req.method()),
+            },
             "/api/users" => match req.method() {
                 hyper::Method::Get => handle_user_get(req, &conn),
                 hyper::Method::Post => handle_user_post(req, conn),
                 _ => return method_not_allowed(req.method()),
             },
-            "/api/towns" => handle_town(&req, &conn),
-            "/api/dwarves" => handle_dwarves(&req, &conn),
+            "/api/towns" => match req.method() {
+                hyper::Method::Get => handle_town(&req, &conn),
+                hyper::Method::Post => handle_town_post(req, conn),
+                _ => return method_not_allowed(req.method()),
+            },
+            "/api/dwarves" => match req.method() {
+                hyper::Method::Get => handle_dwarves(&req, &conn),
+                _ => return method_not_allowed(req.method()),
+            },
             _ => return path_not_found(req.uri().path()),
         };
         resp
@@ -73,6 +83,16 @@ fn handle_user_post(req: Request, ds: datastore::Datastore) -> types::ResponseFu
 fn handle_town(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
     let user_id: i32 = rtry!(get_query_param(&req, "user_id"));
     build_response(isetry!(ds.get_town(user_id)))
+}
+
+fn handle_town_post(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
+    Box::new(req.body().concat2().and_then(move |chunk| {
+        let v: models::UserID = isetry!(
+            serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
+        );
+        let town = isetry!(ds.new_town(v.user_id));
+        build_response(town)
+    }))
 }
 
 fn handle_dwarves(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {

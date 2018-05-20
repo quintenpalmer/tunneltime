@@ -1,3 +1,10 @@
+pub static INSERT_TOWN: &'static str = r#"
+    INSERT INTO
+        towns (user_id, gold)
+    VALUES
+        ($1, 100)
+"#;
+
 pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
     SELECT
         towns.id as town_id,
@@ -6,7 +13,7 @@ pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
         gem_shops.id as gem_shop_id
     FROM
         towns
-    INNER JOIN
+    LEFT JOIN
         gem_shops ON gem_shops.town_id = towns.id
     WHERE
         user_id = $1
