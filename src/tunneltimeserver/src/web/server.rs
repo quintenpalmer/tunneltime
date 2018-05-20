@@ -36,14 +36,23 @@ impl Service for Handler {
             None,
         ));
         let resp = match req.uri().path() {
-            "/health" => handle_health(),
+            "/health" => match req.method() {
+                hyper::Method::Get => handle_health(),
+                _ => return method_not_allowed(req.method()),
+            },
             "/api/users" => match req.method() {
                 hyper::Method::Get => handle_user_get(req, &conn),
                 hyper::Method::Post => handle_user_post(req, conn),
                 _ => return method_not_allowed(req.method()),
             },
-            "/api/towns" => handle_town(&req, &conn),
-            "/api/dwarves" => handle_dwarves(&req, &conn),
+            "/api/towns" => match req.method() {
+                hyper::Method::Get => handle_town(&req, &conn),
+                _ => return method_not_allowed(req.method()),
+            },
+            "/api/dwarves" => match req.method() {
+                hyper::Method::Get => handle_dwarves(&req, &conn),
+                _ => return method_not_allowed(req.method()),
+            },
             _ => return path_not_found(req.uri().path()),
         };
         resp
