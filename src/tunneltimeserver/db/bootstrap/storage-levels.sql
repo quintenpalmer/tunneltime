@@ -1,0 +1,10 @@
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (1, 100);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (2, 200);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (3, 400);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (4, 800);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (5, 1600);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (6, 3200);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (7, 6400);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (8, 12800);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (9, 25600);
+INSERT INTO storage_building_levels (level, max_stone_count) VALUES  (10, 51200);
