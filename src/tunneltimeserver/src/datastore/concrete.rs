@@ -29,8 +29,17 @@ impl Datastore {
     }
 
     pub fn new_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
-        let _ = self.conn.execute(queries::INSERT_TOWN, &[&user_id])?;
-        self.get_town(user_id)
+        let txn = self.conn.transaction()?;
+        let _ = txn.execute(queries::INSERT_TOWN, &[&user_id])?;
+        let simple_town: structs::Town = selects::select_one_by_field(
+            &txn,
+            "towns".to_string(),
+            queries::SIMPLE_TOWN_BY_USER_ID,
+            user_id,
+        )?;
+        let _ = txn.execute(queries::INSERT_NEW_STORAGE_BUILDING, &[&simple_town.id])?;
+        txn.set_commit();
+        return get_town(&txn, user_id);
     }
 
     pub fn get_town(&self, user_id: i32) -> Result<models::Town, error::Error> {

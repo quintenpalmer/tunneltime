@@ -29,7 +29,7 @@ pub struct Dwarf {
     pub name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct Town {
     pub id: i32,
