@@ -35,7 +35,7 @@ impl Datastore {
 
     pub fn get_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
         let town: structs::TownPlus = select_one_by_field(
-            self,
+            &self.conn,
             "towns".to_string(),
             queries::TOWN_BY_USER_ID_SQL,
             user_id,
@@ -43,7 +43,7 @@ impl Datastore {
         let gems = {
             match town.gem_shop_id {
                 Some(gem_shop_id) => {
-                    select_by_field(self, queries::GEMS_BY_GEM_SHOP_ID_SQL, gem_shop_id)?
+                    select_by_field(&self.conn, queries::GEMS_BY_GEM_SHOP_ID_SQL, gem_shop_id)?
                 }
                 None => Vec::new(),
             }
@@ -53,13 +53,13 @@ impl Datastore {
 
     pub fn get_dwarves(&self, town_id: i32) -> Result<Vec<models::Dwarf>, error::Error> {
         let dwarves: Vec<structs::Dwarf> =
-            select_by_field(self, queries::DWARVES_BY_TOWN_ID, town_id)?;
+            select_by_field(&self.conn, queries::DWARVES_BY_TOWN_ID, town_id)?;
         Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
     }
 
     pub fn get_user(&self, user_name: String) -> Result<models::User, error::Error> {
         let user: structs::User = select_one_by_field(
-            self,
+            &self.conn,
             "users".to_string(),
             queries::USER_BY_USER_NAME,
             user_name,
@@ -74,7 +74,7 @@ impl Datastore {
 }
 
 pub fn select_one_by_field<T, F>(
-    ds: &Datastore,
+    ds: &postgres::GenericConnection,
     name: String,
     query: &'static str,
     id: F,
@@ -83,7 +83,7 @@ where
     T: postgres_extra::FromRow,
     F: postgres::types::ToSql,
 {
-    let rows = ds.conn.query(query, &[&id])?;
+    let rows = ds.query(query, &[&id])?;
     if rows.len() != 1 {
         return Err(error::Error::SelectManyOnOne(name));
     }
@@ -93,7 +93,7 @@ where
 }
 
 pub fn select_by_field<T, F>(
-    ds: &Datastore,
+    ds: &postgres::GenericConnection,
     query: &'static str,
     id: F,
 ) -> Result<Vec<T>, error::Error>
@@ -101,7 +101,7 @@ where
     T: postgres_extra::FromRow,
     F: postgres::types::ToSql,
 {
-    let rows = ds.conn.query(query, &[&id])?;
+    let rows = ds.query(query, &[&id])?;
     let mut ret = Vec::new();
     for row in rows.iter() {
         ret.push(T::parse_row(row)?);
