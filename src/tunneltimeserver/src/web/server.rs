@@ -73,12 +73,20 @@ fn handle_user_post(req: Request, ds: datastore::Datastore) -> types::ResponseFu
     }))
 }
 
-fn handle_town(_req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
-    build_response(isetry!(ds.get_town(1)))
+fn handle_town(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
+    let user_id: i32 = match get_query_param(&req, "user_id") {
+        Ok(v) => v,
+        Err(resp) => return resp,
+    };
+    build_response(isetry!(ds.get_town(user_id)))
 }
 
-fn handle_dwarves(_req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
-    build_response(isetry!(ds.get_dwarves(1)))
+fn handle_dwarves(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
+    let town_id: i32 = match get_query_param(&req, "town_id") {
+        Ok(v) => v,
+        Err(resp) => return resp,
+    };
+    build_response(isetry!(ds.get_dwarves(town_id)))
 }
 
 fn get_query_param<T: FromStr>(req: &Request, name: &str) -> Result<T, types::ResponseFuture> {
