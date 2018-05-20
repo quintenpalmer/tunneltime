@@ -8,6 +8,7 @@ pub struct User {
 pub struct NewUser {
     pub user_name: String,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Town {
     pub gem_shop: Option<GemShop>,
