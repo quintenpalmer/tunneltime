@@ -8,12 +8,21 @@ pub struct User {
 pub struct Town {
     pub id: i32,
     pub gem_shop: Option<GemShop>,
+    pub storage_building: StorageBuilding,
     pub gold: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GemShop {
     pub gems: Vec<Gem>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StorageBuilding {
+    pub id: i32,
+    pub level: i32,
+    pub current_stone_count: i32,
+    pub max_stone_count: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -13,9 +13,16 @@ impl structs::TownPlus {
             }
             None => None,
         };
+        let storage_building = models::StorageBuilding {
+            id: self.storage_id,
+            level: self.storage_level,
+            current_stone_count: self.storage_current_stone_count,
+            max_stone_count: self.storage_max_stone_count,
+        };
         models::Town {
             id: self.town_id,
             gem_shop: gem_shop,
+            storage_building: storage_building,
             gold: self.gold,
         }
     }

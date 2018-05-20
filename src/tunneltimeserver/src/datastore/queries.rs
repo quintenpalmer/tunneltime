@@ -21,11 +21,19 @@ pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
         towns.id as town_id,
         towns.user_id,
         towns.gold,
-        gem_shops.id as gem_shop_id
+        gem_shops.id as gem_shop_id,
+        storage_buildings.id as storage_id,
+        storage_buildings.level as storage_level,
+        storage_buildings.current_stone_count as storage_current_stone_count,
+        storage_building_levels.max_stone_count as storage_max_stone_count
     FROM
         towns
     LEFT JOIN
         gem_shops ON gem_shops.town_id = towns.id
+    INNER JOIN
+        storage_buildings ON storage_buildings.town_id = towns.id
+    INNER JOIN
+        storage_building_levels ON storage_buildings.level = storage_building_levels.level
     WHERE
         user_id = $1
 "#;
