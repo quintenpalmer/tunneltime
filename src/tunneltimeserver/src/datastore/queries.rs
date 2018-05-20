@@ -6,7 +6,7 @@ pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
         gem_shops.id as gem_shop_id
     FROM
         towns
-    INNER JOIN
+    LEFT JOIN
         gem_shops ON gem_shops.town_id = towns.id
     WHERE
         user_id = $1
