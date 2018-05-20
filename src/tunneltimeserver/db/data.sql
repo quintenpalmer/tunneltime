@@ -119,6 +119,29 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 
 
 --
+-- Data for Name: storage_building_levels; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.storage_building_levels (level, max_stone_count) FROM stdin;
+\.
+
+
+--
+-- Data for Name: storage_buildings; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.storage_buildings (id, town_id, level, current_stone_count) FROM stdin;
+\.
+
+
+--
+-- Name: storage_buildings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.storage_buildings_id_seq', 1, false);
+
+
+--
 -- Name: towns_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 

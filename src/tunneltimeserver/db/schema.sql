@@ -180,6 +180,55 @@ ALTER SEQUENCE public.gems_id_seq OWNED BY public.gems.id;
 
 
 --
+-- Name: storage_building_levels; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.storage_building_levels (
+    level integer NOT NULL,
+    max_stone_count integer NOT NULL,
+    CONSTRAINT storage_building_levels_max_stone_count_check CHECK ((max_stone_count > 0))
+);
+
+
+ALTER TABLE public.storage_building_levels OWNER TO tunneltime_user;
+
+--
+-- Name: storage_buildings; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.storage_buildings (
+    id integer NOT NULL,
+    town_id integer NOT NULL,
+    level integer NOT NULL,
+    current_stone_count integer NOT NULL,
+    CONSTRAINT storage_buildings_current_stone_count_check CHECK ((current_stone_count >= 0))
+);
+
+
+ALTER TABLE public.storage_buildings OWNER TO tunneltime_user;
+
+--
+-- Name: storage_buildings_id_seq; Type: SEQUENCE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE SEQUENCE public.storage_buildings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.storage_buildings_id_seq OWNER TO tunneltime_user;
+
+--
+-- Name: storage_buildings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: tunneltime_user
+--
+
+ALTER SEQUENCE public.storage_buildings_id_seq OWNED BY public.storage_buildings.id;
+
+
+--
 -- Name: towns; Type: TABLE; Schema: public; Owner: tunneltime_user
 --
 
@@ -276,6 +325,13 @@ ALTER TABLE ONLY public.gems ALTER COLUMN id SET DEFAULT nextval('public.gems_id
 
 
 --
+-- Name: storage_buildings id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.storage_buildings ALTER COLUMN id SET DEFAULT nextval('public.storage_buildings_id_seq'::regclass);
+
+
+--
 -- Name: towns id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
 --
 
@@ -335,6 +391,22 @@ ALTER TABLE ONLY public.gem_types
 
 ALTER TABLE ONLY public.gems
     ADD CONSTRAINT gems_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: storage_building_levels storage_building_levels_level_key; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.storage_building_levels
+    ADD CONSTRAINT storage_building_levels_level_key UNIQUE (level);
+
+
+--
+-- Name: storage_buildings storage_buildings_pkey; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.storage_buildings
+    ADD CONSTRAINT storage_buildings_pkey PRIMARY KEY (id);
 
 
 --
@@ -399,6 +471,22 @@ ALTER TABLE ONLY public.gem_shops
 
 ALTER TABLE ONLY public.gems
     ADD CONSTRAINT gems_gem_type_id_fkey FOREIGN KEY (gem_type_id) REFERENCES public.gem_types(id);
+
+
+--
+-- Name: storage_buildings storage_buildings_level_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.storage_buildings
+    ADD CONSTRAINT storage_buildings_level_fkey FOREIGN KEY (level) REFERENCES public.storage_building_levels(level);
+
+
+--
+-- Name: storage_buildings storage_buildings_town_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.storage_buildings
+    ADD CONSTRAINT storage_buildings_town_id_fkey FOREIGN KEY (town_id) REFERENCES public.towns(id);
 
 
 --
