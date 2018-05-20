@@ -1,5 +1,5 @@
-use postgres;
-use postgres_extra;
+use postgres as pg;
+use postgres_extra as pg_extra;
 
 use tunneltimecore::models;
 
@@ -8,7 +8,7 @@ use datastore::structs;
 use error;
 
 pub struct Datastore {
-    conn: postgres::Connection,
+    conn: pg::Connection,
 }
 
 impl Datastore {
@@ -19,12 +19,12 @@ impl Datastore {
         username: &str,
         password: Option<&str>,
     ) -> Result<Datastore, error::Error> {
-        let connect_params = postgres::params::Builder::new()
+        let connect_params = pg::params::Builder::new()
             .database(dbname)
             .port(port)
             .user(username, password)
-            .build(postgres::params::Host::Tcp(host));
-        let conn = postgres::Connection::connect(connect_params, postgres::TlsMode::None)?;
+            .build(pg::params::Host::Tcp(host));
+        let conn = pg::Connection::connect(connect_params, pg::TlsMode::None)?;
         return Ok(Datastore { conn: conn });
     }
 
@@ -88,14 +88,14 @@ impl Datastore {
 }
 
 pub fn select_one_by_field<T, F>(
-    ds: &postgres::GenericConnection,
+    ds: &pg::GenericConnection,
     name: String,
     query: &'static str,
     id: F,
 ) -> Result<T, error::Error>
 where
-    T: postgres_extra::FromRow,
-    F: postgres::types::ToSql,
+    T: pg_extra::FromRow,
+    F: pg::types::ToSql,
 {
     let rows = ds.query(query, &[&id])?;
     if rows.len() != 1 {
@@ -107,13 +107,13 @@ where
 }
 
 pub fn select_by_field<T, F>(
-    ds: &postgres::GenericConnection,
+    ds: &pg::GenericConnection,
     query: &'static str,
     id: F,
 ) -> Result<Vec<T>, error::Error>
 where
-    T: postgres_extra::FromRow,
-    F: postgres::types::ToSql,
+    T: pg_extra::FromRow,
+    F: pg::types::ToSql,
 {
     let rows = ds.query(query, &[&id])?;
     let mut ret = Vec::new();

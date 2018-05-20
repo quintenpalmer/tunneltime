@@ -1,6 +1,6 @@
 use hyper;
-use postgres;
-use postgres_extra;
+use postgres as pg;
+use postgres_extra as pg_extra;
 use serde_json;
 use std::io;
 
@@ -10,8 +10,8 @@ pub enum Error {
     IO(io::Error),
     HyperURI(hyper::error::UriError),
     Hyper(hyper::Error),
-    Postgres(postgres::error::Error),
-    PostgresExtra(postgres_extra::ExtraError),
+    Postgres(pg::error::Error),
+    PostgresExtra(pg_extra::ExtraError),
     SelectManyOnOne(String),
 }
 
@@ -39,17 +39,17 @@ impl From<hyper::error::UriError> for Error {
     }
 }
 
-impl From<postgres::error::Error> for Error {
-    fn from(error: postgres::error::Error) -> Self {
+impl From<pg::error::Error> for Error {
+    fn from(error: pg::error::Error) -> Self {
         Error::Postgres(error)
     }
 }
 
-impl From<postgres_extra::Error> for Error {
-    fn from(error: postgres_extra::Error) -> Self {
+impl From<pg_extra::Error> for Error {
+    fn from(error: pg_extra::Error) -> Self {
         match error {
-            postgres_extra::Error::Postgres(pg_error) => Error::Postgres(pg_error),
-            postgres_extra::Error::Extra(extra_error) => Error::PostgresExtra(extra_error),
+            pg_extra::Error::Postgres(pg_error) => Error::Postgres(pg_error),
+            pg_extra::Error::Extra(extra_error) => Error::PostgresExtra(extra_error),
         }
     }
 }
