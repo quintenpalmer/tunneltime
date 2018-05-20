@@ -290,6 +290,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
+-- Name: dwarves dwarves_name_unique; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.dwarves
+    ADD CONSTRAINT dwarves_name_unique UNIQUE (town_id, name);
+
+
+--
 -- Name: dwarves dwarves_pkey; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
 --
 
