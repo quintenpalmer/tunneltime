@@ -1,9 +1,9 @@
 use postgres as pg;
-use postgres_extra as pg_extra;
 
 use tunneltimecore::models;
 
 use datastore::queries;
+use datastore::selects;
 use datastore::structs;
 use error;
 
@@ -29,26 +29,21 @@ impl Datastore {
     }
 
     pub fn new_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
-        let _ = self.conn.execute(queries::INSERT_TOWN, &[&user_id])?;
-        self.get_town(user_id)
+        let txn = self.conn.transaction()?;
+        let _ = txn.execute(queries::INSERT_TOWN, &[&user_id])?;
+        let simple_town: structs::Town = selects::select_one_by_field(
+            &txn,
+            "towns".to_string(),
+            queries::SIMPLE_TOWN_BY_USER_ID,
+            user_id,
+        )?;
+        let _ = txn.execute(queries::INSERT_NEW_STORAGE_BUILDING, &[&simple_town.id])?;
+        txn.set_commit();
+        return get_town(&txn, user_id);
     }
 
     pub fn get_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
-        let town: structs::TownPlus = select_one_by_field(
-            &self.conn,
-            "towns".to_string(),
-            queries::TOWN_BY_USER_ID_SQL,
-            user_id,
-        )?;
-        let gems = {
-            match town.gem_shop_id {
-                Some(gem_shop_id) => {
-                    select_by_field(&self.conn, queries::GEMS_BY_GEM_SHOP_ID_SQL, gem_shop_id)?
-                }
-                None => Vec::new(),
-            }
-        };
-        Ok(town.into_model(gems))
+        return get_town(&self.conn, user_id);
     }
 
     pub fn recruit_dwarf(
@@ -60,19 +55,19 @@ impl Datastore {
         let _ = txn.execute(queries::INSERT_DWARF, &[&town_id, &dwarf_name])?;
         let _ = txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id])?;
         let dwarves: Vec<structs::Dwarf> =
-            select_by_field(&txn, queries::DWARVES_BY_TOWN_ID, town_id)?;
+            selects::select_by_field(&txn, queries::DWARVES_BY_TOWN_ID, town_id)?;
         txn.set_commit();
         Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
     }
 
     pub fn get_dwarves(&self, town_id: i32) -> Result<Vec<models::Dwarf>, error::Error> {
         let dwarves: Vec<structs::Dwarf> =
-            select_by_field(&self.conn, queries::DWARVES_BY_TOWN_ID, town_id)?;
+            selects::select_by_field(&self.conn, queries::DWARVES_BY_TOWN_ID, town_id)?;
         Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
     }
 
     pub fn get_user(&self, user_name: String) -> Result<models::User, error::Error> {
-        let user: structs::User = select_one_by_field(
+        let user: structs::User = selects::select_one_by_field(
             &self.conn,
             "users".to_string(),
             queries::USER_BY_USER_NAME,
@@ -87,38 +82,20 @@ impl Datastore {
     }
 }
 
-pub fn select_one_by_field<T, F>(
-    ds: &pg::GenericConnection,
-    name: String,
-    query: &'static str,
-    id: F,
-) -> Result<T, error::Error>
-where
-    T: pg_extra::FromRow,
-    F: pg::types::ToSql,
-{
-    let rows = ds.query(query, &[&id])?;
-    if rows.len() != 1 {
-        return Err(error::Error::SelectManyOnOne(name));
-    }
-    let row = rows.get(0);
-    let ret = T::parse_row(row)?;
-    Ok(ret)
-}
-
-pub fn select_by_field<T, F>(
-    ds: &pg::GenericConnection,
-    query: &'static str,
-    id: F,
-) -> Result<Vec<T>, error::Error>
-where
-    T: pg_extra::FromRow,
-    F: pg::types::ToSql,
-{
-    let rows = ds.query(query, &[&id])?;
-    let mut ret = Vec::new();
-    for row in rows.iter() {
-        ret.push(T::parse_row(row)?);
-    }
-    return Ok(ret);
+fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, error::Error> {
+    let town: structs::TownPlus = selects::select_one_by_field(
+        ds,
+        "towns".to_string(),
+        queries::TOWN_BY_USER_ID_SQL,
+        user_id,
+    )?;
+    let gems = {
+        match town.gem_shop_id {
+            Some(gem_shop_id) => {
+                selects::select_by_field(ds, queries::GEMS_BY_GEM_SHOP_ID_SQL, gem_shop_id)?
+            }
+            None => Vec::new(),
+        }
+    };
+    Ok(town.into_model(gems))
 }

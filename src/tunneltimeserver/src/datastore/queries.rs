@@ -5,16 +5,35 @@ pub static INSERT_TOWN: &'static str = r#"
         ($1, 100)
 "#;
 
+pub static SIMPLE_TOWN_BY_USER_ID: &'static str = r#"
+    SELECT
+        towns.id,
+        towns.user_id,
+        towns.gold
+    FROM
+        towns
+    WHERE
+        user_id = $1
+"#;
+
 pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
     SELECT
         towns.id as town_id,
         towns.user_id,
         towns.gold,
-        gem_shops.id as gem_shop_id
+        gem_shops.id as gem_shop_id,
+        storage_buildings.id as storage_id,
+        storage_buildings.level as storage_level,
+        storage_buildings.current_stone_count as storage_current_stone_count,
+        storage_building_levels.max_stone_count as storage_max_stone_count
     FROM
         towns
     LEFT JOIN
         gem_shops ON gem_shops.town_id = towns.id
+    INNER JOIN
+        storage_buildings ON storage_buildings.town_id = towns.id
+    INNER JOIN
+        storage_building_levels ON storage_buildings.level = storage_building_levels.level
     WHERE
         user_id = $1
 "#;
@@ -66,6 +85,13 @@ pub static INSERT_DWARF: &'static str = r#"
         dwarves (town_id, name)
     VALUES
         ($1, $2)
+"#;
+
+pub static INSERT_NEW_STORAGE_BUILDING: &'static str = r#"
+    INSERT INTO
+        storage_buildings (town_id, level, current_stone_count)
+    VALUES
+        ($1, 1, 0);
 "#;
 
 pub static USER_BY_USER_NAME: &'static str = r#"

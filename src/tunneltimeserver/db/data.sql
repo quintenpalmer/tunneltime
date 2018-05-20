@@ -41,6 +41,7 @@ COPY public.users (id, user_name) FROM stdin;
 1	postprompt
 2	other user
 3	qp
+4	qptest
 \.
 
 
@@ -52,6 +53,7 @@ COPY public.towns (id, user_id, gold) FROM stdin;
 2	2	100
 3	3	100
 1	1	80
+4	4	100
 \.
 
 
@@ -119,17 +121,54 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 
 
 --
+-- Data for Name: storage_building_levels; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.storage_building_levels (level, max_stone_count) FROM stdin;
+1	100
+2	200
+3	400
+4	800
+5	1600
+6	3200
+7	6400
+8	12800
+9	25600
+10	51200
+\.
+
+
+--
+-- Data for Name: storage_buildings; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.storage_buildings (id, town_id, level, current_stone_count) FROM stdin;
+1	4	1	0
+2	1	1	0
+3	2	1	0
+4	3	1	0
+\.
+
+
+--
+-- Name: storage_buildings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.storage_buildings_id_seq', 4, true);
+
+
+--
 -- Name: towns_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.towns_id_seq', 3, true);
+SELECT pg_catalog.setval('public.towns_id_seq', 4, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 3, true);
+SELECT pg_catalog.setval('public.users_id_seq', 4, true);
 
 
 --

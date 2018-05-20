@@ -5,6 +5,10 @@ pub struct TownPlus {
     pub user_id: i32,
     pub gold: i32,
     pub gem_shop_id: Option<i32>,
+    pub storage_id: i32,
+    pub storage_level: i32,
+    pub storage_current_stone_count: i32,
+    pub storage_max_stone_count: i32,
 }
 
 #[derive(Debug, FromRow)]
@@ -29,7 +33,7 @@ pub struct Dwarf {
     pub name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct Town {
     pub id: i32,
