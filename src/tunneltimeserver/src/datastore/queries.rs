@@ -38,6 +38,18 @@ pub static TOWN_BY_USER_ID_SQL: &'static str = r#"
         user_id = $1
 "#;
 
+pub static MINES_BY_TOWN_ID: &'static str = r#"
+    SELECT
+        mines.id,
+        mines.town_id,
+        mines.total_stone,
+        mines.stone_density
+    FROM
+        mines
+    WHERE
+        mines.town_id = $1
+"#;
+
 pub static UPDATE_TOWN_GOLD: &'static str = r#"
     UPDATE
         towns

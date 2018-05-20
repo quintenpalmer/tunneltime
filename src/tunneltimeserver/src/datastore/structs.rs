@@ -40,6 +40,14 @@ pub struct Town {
     pub user_id: i32,
 }
 
+#[derive(Debug, FromRow)]
+pub struct Mine {
+    pub id: i32,
+    pub town_id: i32,
+    pub total_stone: i32,
+    pub stone_density: i32,
+}
+
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct GemShop {
