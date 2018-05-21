@@ -98,12 +98,13 @@ fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, er
             None => Vec::new(),
         }
     };
-    let mine: structs::Mine = selects::select_one_by_field(
-        ds,
-        "mines".to_string(),
-        queries::MINES_BY_TOWN_ID,
-        town.town_id,
-    )?;
+    let mine = get_mine(ds, town.town_id)?;
 
     Ok(town.into_model(gems, mine))
+}
+
+fn get_mine(ds: &pg::GenericConnection, town_id: i32) -> Result<structs::Mine, error::Error> {
+    let mine: structs::Mine =
+        selects::select_one_by_field(ds, "mines".to_string(), queries::MINES_BY_TOWN_ID, town_id)?;
+    Ok(mine)
 }
