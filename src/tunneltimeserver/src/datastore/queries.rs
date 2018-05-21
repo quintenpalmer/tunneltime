@@ -78,9 +78,12 @@ pub static DWARVES_BY_TOWN_ID: &'static str = r#"
 	SELECT
         dwarves.id,
         dwarves.town_id,
-        dwarves.name
+        dwarves.name,
+        dwarf_mine_trips.finish_time < now() as past_finish_time
     FROM
         dwarves
+    LEFT JOIN
+        dwarf_mine_trips ON dwarf_mine_trips.dwarf_id = dwarves.id
     WHERE
         dwarves.town_id = $1
 "#;
