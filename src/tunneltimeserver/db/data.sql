@@ -27,13 +27,6 @@ COPY public.dwarves (id, town_id, name) FROM stdin;
 
 
 --
--- Name: dwarves_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
---
-
-SELECT pg_catalog.setval('public.dwarves_id_seq', 7, true);
-
-
---
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
 --
 
@@ -57,6 +50,34 @@ COPY public.towns (id, user_id, gold) FROM stdin;
 4	4	100
 5	5	100
 \.
+
+
+--
+-- Data for Name: mines; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.mines (id, town_id, total_stone, stone_density) FROM stdin;
+1	1	1000	5
+2	2	1000	5
+3	3	1000	5
+4	4	1000	5
+5	5	1000	5
+\.
+
+
+--
+-- Data for Name: dwarf_mine_trips; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.dwarf_mine_trips (dwarf_id, mine_id, finish_time) FROM stdin;
+\.
+
+
+--
+-- Name: dwarves_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.dwarves_id_seq', 7, true);
 
 
 --
@@ -120,19 +141,6 @@ SELECT pg_catalog.setval('public.gem_types_id_seq', 3, true);
 --
 
 SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
-
-
---
--- Data for Name: mines; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
---
-
-COPY public.mines (id, town_id, total_stone, stone_density) FROM stdin;
-1	1	1000	5
-2	2	1000	5
-3	3	1000	5
-4	4	1000	5
-5	5	1000	5
-\.
 
 
 --
