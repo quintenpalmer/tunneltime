@@ -81,6 +81,31 @@ impl Datastore {
         let _ = self.conn.execute(queries::INSERT_USER, &[&user_name])?;
         self.get_user(user_name)
     }
+
+    pub fn send_dwarf_digging(&self, dwarf_id: i32) -> Result<models::Dwarf, error::Error> {
+        let txn = self.conn.transaction()?;
+        let dwarf: structs::DwarfPlus = selects::select_one_by_field(
+            &txn,
+            "dwarves".to_string(),
+            queries::DWARF_BY_ID,
+            dwarf_id,
+        )?;
+        let model_dwarf = dwarf.into_model();
+        match model_dwarf.status {
+            models::DwarfStatus::Free => (),
+            models::DwarfStatus::Digging => return Err(error::Error::DwarfBusy(dwarf_id)),
+        };
+        let mine = get_mine(&txn, dwarf.town_id)?;
+        let _ = txn.execute(queries::SEND_DWARF_DIGGING, &[&dwarf.id, &mine.id]);
+        let dwarf2: structs::DwarfPlus = selects::select_one_by_field(
+            &txn,
+            "dwarves".to_string(),
+            queries::DWARF_BY_ID,
+            dwarf_id,
+        )?;
+        txn.set_commit();
+        Ok(dwarf2.into_model())
+    }
 }
 
 fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, error::Error> {

@@ -88,6 +88,20 @@ pub static DWARVES_BY_TOWN_ID: &'static str = r#"
         dwarves.town_id = $1
 "#;
 
+pub static DWARF_BY_ID: &'static str = r#"
+	SELECT
+        dwarves.id,
+        dwarves.town_id,
+        dwarves.name,
+        dwarf_mine_trips.finish_time < now() as past_finish_time
+    FROM
+        dwarves
+    LEFT JOIN
+        dwarf_mine_trips ON dwarf_mine_trips.dwarf_id = dwarves.id
+    WHERE
+        dwarves.id = $1
+"#;
+
 pub static INSERT_USER: &'static str = r#"
     INSERT INTO
         users (user_name)
@@ -123,4 +137,10 @@ pub static USER_BY_USER_NAME: &'static str = r#"
         users
     WHERE
         users.user_name = $1
+"#;
+
+pub static SEND_DWARF_DIGGING: &'static str = r#"
+    INSERT INTO
+        dwarf_mine_trips (dwarf_id, mine_id, finish_time)
+    VALUES ($1, $2, now() + '1 minute')
 "#;

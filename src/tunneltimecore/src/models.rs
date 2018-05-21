@@ -76,3 +76,10 @@ pub struct DwarfCreation {
 pub struct NewUser {
     pub user_name: String,
 }
+
+// PUT bodies
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DwarfDigging {
+    pub dwarf_id: i32,
+}
