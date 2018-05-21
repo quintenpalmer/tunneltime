@@ -54,10 +54,10 @@ impl structs::GemPlus {
 }
 
 impl structs::DwarfPlus {
-    pub fn into_model(self) -> models::Dwarf {
+    pub fn into_model(&self) -> models::Dwarf {
         models::Dwarf {
             id: self.id,
-            name: self.name,
+            name: self.name.clone(),
             status: match self.past_finish_time {
                 Some(true) => models::DwarfStatus::Free,
                 Some(false) => models::DwarfStatus::Digging,
