@@ -55,14 +55,14 @@ impl Datastore {
         let txn = self.conn.transaction()?;
         let _ = txn.execute(queries::INSERT_DWARF, &[&town_id, &dwarf_name])?;
         let _ = txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id])?;
-        let dwarves: Vec<structs::Dwarf> =
+        let dwarves: Vec<structs::DwarfPlus> =
             selects::select_by_field(&txn, queries::DWARVES_BY_TOWN_ID, town_id)?;
         txn.set_commit();
         Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
     }
 
     pub fn get_dwarves(&self, town_id: i32) -> Result<Vec<models::Dwarf>, error::Error> {
-        let dwarves: Vec<structs::Dwarf> =
+        let dwarves: Vec<structs::DwarfPlus> =
             selects::select_by_field(&self.conn, queries::DWARVES_BY_TOWN_ID, town_id)?;
         Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
     }
@@ -81,6 +81,31 @@ impl Datastore {
         let _ = self.conn.execute(queries::INSERT_USER, &[&user_name])?;
         self.get_user(user_name)
     }
+
+    pub fn send_dwarf_digging(&self, dwarf_id: i32) -> Result<models::Dwarf, error::Error> {
+        let txn = self.conn.transaction()?;
+        let dwarf: structs::DwarfPlus = selects::select_one_by_field(
+            &txn,
+            "dwarves".to_string(),
+            queries::DWARF_BY_ID,
+            dwarf_id,
+        )?;
+        let model_dwarf = dwarf.into_model();
+        match model_dwarf.status {
+            models::DwarfStatus::Free => (),
+            models::DwarfStatus::Digging => return Err(error::Error::DwarfBusy(dwarf_id)),
+        };
+        let mine = get_mine(&txn, dwarf.town_id)?;
+        let _ = txn.execute(queries::SEND_DWARF_DIGGING, &[&dwarf.id, &mine.id]);
+        let dwarf2: structs::DwarfPlus = selects::select_one_by_field(
+            &txn,
+            "dwarves".to_string(),
+            queries::DWARF_BY_ID,
+            dwarf_id,
+        )?;
+        txn.set_commit();
+        Ok(dwarf2.into_model())
+    }
 }
 
 fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, error::Error> {
@@ -98,12 +123,15 @@ fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, er
             None => Vec::new(),
         }
     };
-    let mine: structs::Mine = selects::select_one_by_field(
-        ds,
-        "mines".to_string(),
-        queries::MINES_BY_TOWN_ID,
-        town.town_id,
-    )?;
+    let mine = get_mine(ds, town.town_id)?;
+    let stones: Vec<structs::Stone> =
+        selects::select_by_field(ds, queries::GET_DWARF_DIGGING_STONE, town.town_id)?;
 
-    Ok(town.into_model(gems, mine))
+    Ok(town.into_model(gems, mine, stones))
+}
+
+fn get_mine(ds: &pg::GenericConnection, town_id: i32) -> Result<structs::Mine, error::Error> {
+    let mine: structs::Mine =
+        selects::select_one_by_field(ds, "mines".to_string(), queries::MINES_BY_TOWN_ID, town_id)?;
+    Ok(mine)
 }

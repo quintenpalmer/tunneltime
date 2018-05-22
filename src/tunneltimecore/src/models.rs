@@ -47,9 +47,16 @@ pub enum GemType {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub enum DwarfStatus {
+    Free,
+    Digging,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Dwarf {
     pub id: i32,
     pub name: String,
+    pub status: DwarfStatus,
 }
 
 // POST bodies
@@ -68,4 +75,11 @@ pub struct DwarfCreation {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewUser {
     pub user_name: String,
+}
+
+// PUT bodies
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DwarfDigging {
+    pub dwarf_id: i32,
 }

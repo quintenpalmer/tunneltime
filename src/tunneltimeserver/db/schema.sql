@@ -34,6 +34,19 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: dwarf_mine_trips; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.dwarf_mine_trips (
+    dwarf_id integer NOT NULL,
+    mine_id integer NOT NULL,
+    finish_time timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.dwarf_mine_trips OWNER TO tunneltime_user;
+
+--
 -- Name: dwarves; Type: TABLE; Schema: public; Owner: tunneltime_user
 --
 
@@ -390,6 +403,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
+-- Name: dwarf_mine_trips dwarf_mine_trips_dwarf_id_key; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.dwarf_mine_trips
+    ADD CONSTRAINT dwarf_mine_trips_dwarf_id_key UNIQUE (dwarf_id);
+
+
+--
 -- Name: dwarves dwarves_name_unique; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
 --
 
@@ -491,6 +512,22 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_user_name_key UNIQUE (user_name);
+
+
+--
+-- Name: dwarf_mine_trips dwarf_mine_trips_dwarf_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.dwarf_mine_trips
+    ADD CONSTRAINT dwarf_mine_trips_dwarf_id_fkey FOREIGN KEY (dwarf_id) REFERENCES public.dwarves(id);
+
+
+--
+-- Name: dwarf_mine_trips dwarf_mine_trips_mine_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.dwarf_mine_trips
+    ADD CONSTRAINT dwarf_mine_trips_mine_id_fkey FOREIGN KEY (mine_id) REFERENCES public.mines(id);
 
 
 --

@@ -12,10 +12,23 @@ pub struct TownPlus {
 }
 
 #[derive(Debug, FromRow)]
+pub struct DwarfPlus {
+    pub id: i32,
+    pub town_id: i32,
+    pub name: String,
+    pub past_finish_time: Option<bool>,
+}
+
+#[derive(Debug, FromRow)]
 pub struct GemPlus {
     pub gem_id: i32,
     pub size: i32,
     pub gem_type_name: String,
+}
+
+#[derive(Debug, FromRow)]
+pub struct Stone {
+    pub stone_count: i32,
 }
 
 // Raw Structs

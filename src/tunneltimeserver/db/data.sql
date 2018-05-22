@@ -27,13 +27,6 @@ COPY public.dwarves (id, town_id, name) FROM stdin;
 
 
 --
--- Name: dwarves_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
---
-
-SELECT pg_catalog.setval('public.dwarves_id_seq', 7, true);
-
-
---
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
 --
 
@@ -42,6 +35,7 @@ COPY public.users (id, user_name) FROM stdin;
 2	other user
 3	qp
 4	qptest
+5	qptestagain
 \.
 
 
@@ -54,7 +48,36 @@ COPY public.towns (id, user_id, gold) FROM stdin;
 3	3	100
 1	1	80
 4	4	100
+5	5	100
 \.
+
+
+--
+-- Data for Name: mines; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.mines (id, town_id, total_stone, stone_density) FROM stdin;
+1	1	1000	5
+2	2	1000	5
+3	3	1000	5
+4	4	1000	5
+5	5	1000	5
+\.
+
+
+--
+-- Data for Name: dwarf_mine_trips; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.dwarf_mine_trips (dwarf_id, mine_id, finish_time) FROM stdin;
+\.
+
+
+--
+-- Name: dwarves_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.dwarves_id_seq', 7, true);
 
 
 --
@@ -121,22 +144,10 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 
 
 --
--- Data for Name: mines; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
---
-
-COPY public.mines (id, town_id, total_stone, stone_density) FROM stdin;
-1	1	1000	5
-2	2	1000	5
-3	3	1000	5
-4	4	1000	5
-\.
-
-
---
 -- Name: mines_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.mines_id_seq', 4, true);
+SELECT pg_catalog.setval('public.mines_id_seq', 5, true);
 
 
 --
@@ -166,6 +177,7 @@ COPY public.storage_buildings (id, town_id, level, current_stone_count) FROM std
 2	1	1	0
 3	2	1	0
 4	3	1	0
+5	5	1	0
 \.
 
 
@@ -173,21 +185,21 @@ COPY public.storage_buildings (id, town_id, level, current_stone_count) FROM std
 -- Name: storage_buildings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.storage_buildings_id_seq', 4, true);
+SELECT pg_catalog.setval('public.storage_buildings_id_seq', 5, true);
 
 
 --
 -- Name: towns_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.towns_id_seq', 4, true);
+SELECT pg_catalog.setval('public.towns_id_seq', 5, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 4, true);
+SELECT pg_catalog.setval('public.users_id_seq', 5, true);
 
 
 --

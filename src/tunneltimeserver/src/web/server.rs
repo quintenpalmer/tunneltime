@@ -53,6 +53,7 @@ impl Service for Handler {
             "/api/dwarves" => match req.method() {
                 hyper::Method::Get => handle_dwarves(&req, &conn),
                 hyper::Method::Post => handle_dwarves_post(req, conn),
+                hyper::Method::Put => handle_dwarf_put(req, conn),
                 _ => return method_not_allowed(req.method()),
             },
             _ => return path_not_found(req.uri().path()),
@@ -107,6 +108,16 @@ fn handle_dwarves_post(req: Request, ds: datastore::Datastore) -> types::Respons
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
         let dwarf = isetry!(ds.recruit_dwarf(v.town_id, v.dwarf_name));
+        build_response(dwarf)
+    }))
+}
+
+fn handle_dwarf_put(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
+    Box::new(req.body().concat2().and_then(move |chunk| {
+        let v: models::DwarfDigging = isetry!(
+            serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
+        );
+        let dwarf = isetry!(ds.send_dwarf_digging(v.dwarf_id));
         build_response(dwarf)
     }))
 }
