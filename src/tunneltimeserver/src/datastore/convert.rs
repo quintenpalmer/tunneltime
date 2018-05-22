@@ -65,7 +65,7 @@ impl structs::DwarfPlus {
             id: self.id,
             name: self.name.clone(),
             status: match self.past_finish_time {
-                Some(true) => models::DwarfStatus::Free,
+                Some(true) => models::DwarfStatus::Returned,
                 Some(false) => models::DwarfStatus::Digging,
                 None => models::DwarfStatus::Free,
             },

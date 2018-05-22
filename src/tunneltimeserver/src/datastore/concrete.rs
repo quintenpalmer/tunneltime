@@ -94,6 +94,7 @@ impl Datastore {
         match model_dwarf.status {
             models::DwarfStatus::Free => (),
             models::DwarfStatus::Digging => return Err(error::Error::DwarfBusy(dwarf_id)),
+            models::DwarfStatus::Returned => return Err(error::Error::DwarfBusy(dwarf_id)),
         };
         let mine = get_mine(&txn, dwarf.town_id)?;
         let _ = txn.execute(queries::SEND_DWARF_DIGGING, &[&dwarf.id, &mine.id]);

@@ -50,6 +50,7 @@ pub enum GemType {
 pub enum DwarfStatus {
     Free,
     Digging,
+    Returned,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
