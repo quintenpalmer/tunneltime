@@ -124,8 +124,10 @@ fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, er
         }
     };
     let mine = get_mine(ds, town.town_id)?;
+    let stones: Vec<structs::Stone> =
+        selects::select_by_field(ds, queries::GET_DWARF_DIGGING_STONE, town.town_id)?;
 
-    Ok(town.into_model(gems, mine))
+    Ok(town.into_model(gems, mine, stones))
 }
 
 fn get_mine(ds: &pg::GenericConnection, town_id: i32) -> Result<structs::Mine, error::Error> {

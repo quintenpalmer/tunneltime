@@ -26,6 +26,11 @@ pub struct GemPlus {
     pub gem_type_name: String,
 }
 
+#[derive(Debug, FromRow)]
+pub struct Stone {
+    pub stone_count: i32,
+}
+
 // Raw Structs
 
 #[derive(Debug, FromRow)]

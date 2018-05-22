@@ -74,6 +74,19 @@ pub static GEMS_BY_GEM_SHOP_ID_SQL: &'static str = r#"
         gem_shop_gems.gem_shop_id = $1
 "#;
 
+pub static GET_DWARF_DIGGING_STONE: &'static str = r#"
+    SELECT
+        mines.stone_density as stone_count
+    FROM
+        dwarf_mine_trips
+    INNER JOIN
+        mines ON dwarf_mine_trips.mine_id = mines.id
+    WHERE
+        dwarf_mine_trips.finish_time < now()
+    AND
+        mines.town_id = $1
+"#;
+
 pub static DWARVES_BY_TOWN_ID: &'static str = r#"
 	SELECT
         dwarves.id,
