@@ -157,3 +157,12 @@ pub static SEND_DWARF_DIGGING: &'static str = r#"
         dwarf_mine_trips (dwarf_id, mine_id, finish_time)
     VALUES ($1, $2, now() + '1 minute')
 "#;
+
+pub static MARK_MINE_STONE_LOSS: &'static str = r#"
+    UPDATE
+        mines
+    SET
+        total_stone = (total_stone - stone_density)
+    WHERE
+        id = $1
+"#;

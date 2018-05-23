@@ -89,6 +89,7 @@ impl Datastore {
         };
         let mine = get_mine(&txn, dwarf.town_id)?;
         let _ = txn.execute(queries::SEND_DWARF_DIGGING, &[&dwarf.id, &mine.id]);
+        let _ = txn.execute(queries::MARK_MINE_STONE_LOSS, &[&mine.id])?;
         let dwarf2 = get_dwarf(&txn, dwarf_id)?;
         txn.set_commit();
         Ok(dwarf2)
