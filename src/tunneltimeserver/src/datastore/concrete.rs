@@ -55,16 +55,13 @@ impl Datastore {
         let txn = self.conn.transaction()?;
         let _ = txn.execute(queries::INSERT_DWARF, &[&town_id, &dwarf_name])?;
         let _ = txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id])?;
-        let dwarves: Vec<structs::DwarfPlus> =
-            selects::select_by_field(&txn, queries::DWARVES_BY_TOWN_ID, town_id)?;
+        let dwarves = get_dwarves(&txn, town_id)?;
         txn.set_commit();
-        Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
+        Ok(dwarves)
     }
 
     pub fn get_dwarves(&self, town_id: i32) -> Result<Vec<models::Dwarf>, error::Error> {
-        let dwarves: Vec<structs::DwarfPlus> =
-            selects::select_by_field(&self.conn, queries::DWARVES_BY_TOWN_ID, town_id)?;
-        Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
+        get_dwarves(&self.conn, town_id)
     }
 
     pub fn get_user(&self, user_name: String) -> Result<models::User, error::Error> {
@@ -124,6 +121,15 @@ fn get_mine(ds: &pg::GenericConnection, town_id: i32) -> Result<structs::Mine, e
     let mine: structs::Mine =
         selects::select_one_by_field(ds, "mines".to_string(), queries::MINES_BY_TOWN_ID, town_id)?;
     Ok(mine)
+}
+
+fn get_dwarves(
+    ds: &pg::GenericConnection,
+    town_id: i32,
+) -> Result<Vec<models::Dwarf>, error::Error> {
+    let dwarves: Vec<structs::DwarfPlus> =
+        selects::select_by_field(ds, queries::DWARVES_BY_TOWN_ID, town_id)?;
+    Ok(dwarves.into_iter().map(|x| x.into_model()).collect())
 }
 
 fn get_dwarf(ds: &pg::GenericConnection, dwarf_id: i32) -> Result<models::Dwarf, error::Error> {
