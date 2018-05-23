@@ -84,28 +84,17 @@ impl Datastore {
 
     pub fn send_dwarf_digging(&self, dwarf_id: i32) -> Result<models::Dwarf, error::Error> {
         let txn = self.conn.transaction()?;
-        let dwarf: structs::DwarfPlus = selects::select_one_by_field(
-            &txn,
-            "dwarves".to_string(),
-            queries::DWARF_BY_ID,
-            dwarf_id,
-        )?;
-        let model_dwarf = dwarf.into_model();
-        match model_dwarf.status {
+        let dwarf = get_dwarf(&txn, dwarf_id)?;
+        match dwarf.status {
             models::DwarfStatus::Free => (),
             models::DwarfStatus::Digging => return Err(error::Error::DwarfBusy(dwarf_id)),
             models::DwarfStatus::Returned => return Err(error::Error::DwarfBusy(dwarf_id)),
         };
         let mine = get_mine(&txn, dwarf.town_id)?;
         let _ = txn.execute(queries::SEND_DWARF_DIGGING, &[&dwarf.id, &mine.id]);
-        let dwarf2: structs::DwarfPlus = selects::select_one_by_field(
-            &txn,
-            "dwarves".to_string(),
-            queries::DWARF_BY_ID,
-            dwarf_id,
-        )?;
+        let dwarf2 = get_dwarf(&txn, dwarf_id)?;
         txn.set_commit();
-        Ok(dwarf2.into_model())
+        Ok(dwarf2)
     }
 }
 
@@ -135,4 +124,11 @@ fn get_mine(ds: &pg::GenericConnection, town_id: i32) -> Result<structs::Mine, e
     let mine: structs::Mine =
         selects::select_one_by_field(ds, "mines".to_string(), queries::MINES_BY_TOWN_ID, town_id)?;
     Ok(mine)
+}
+
+fn get_dwarf(ds: &pg::GenericConnection, dwarf_id: i32) -> Result<models::Dwarf, error::Error> {
+    let dwarf: structs::DwarfPlus =
+        selects::select_one_by_field(ds, "dwarves".to_string(), queries::DWARF_BY_ID, dwarf_id)?;
+    let model_dwarf = dwarf.into_model();
+    Ok(model_dwarf)
 }
