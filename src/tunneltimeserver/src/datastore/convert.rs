@@ -69,6 +69,7 @@ impl structs::DwarfPlus {
                 Some(false) => models::DwarfStatus::Digging,
                 None => models::DwarfStatus::Free,
             },
+            town_id: self.town_id,
         }
     }
 }

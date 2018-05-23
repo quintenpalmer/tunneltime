@@ -58,6 +58,7 @@ pub struct Dwarf {
     pub id: i32,
     pub name: String,
     pub status: DwarfStatus,
+    pub town_id: i32,
 }
 
 // POST bodies
