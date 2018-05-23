@@ -30,15 +30,15 @@ impl Datastore {
 
     pub fn new_town(&self, user_id: i32) -> Result<models::Town, error::Error> {
         let txn = self.conn.transaction()?;
-        let _ = txn.execute(queries::INSERT_TOWN, &[&user_id])?;
+        txn.execute(queries::INSERT_TOWN, &[&user_id])?;
         let simple_town: structs::Town = selects::select_one_by_field(
             &txn,
             "towns".to_string(),
             queries::SIMPLE_TOWN_BY_USER_ID,
             user_id,
         )?;
-        let _ = txn.execute(queries::INSERT_NEW_STORAGE_BUILDING, &[&simple_town.id])?;
-        let _ = txn.execute(queries::INSERT_NEW_MINE, &[&simple_town.id])?;
+        txn.execute(queries::INSERT_NEW_STORAGE_BUILDING, &[&simple_town.id])?;
+        txn.execute(queries::INSERT_NEW_MINE, &[&simple_town.id])?;
         txn.set_commit();
         return get_town(&txn, user_id);
     }
@@ -53,8 +53,8 @@ impl Datastore {
         dwarf_name: String,
     ) -> Result<Vec<models::Dwarf>, error::Error> {
         let txn = self.conn.transaction()?;
-        let _ = txn.execute(queries::INSERT_DWARF, &[&town_id, &dwarf_name])?;
-        let _ = txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id])?;
+        txn.execute(queries::INSERT_DWARF, &[&town_id, &dwarf_name])?;
+        txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id])?;
         let dwarves = get_dwarves(&txn, town_id)?;
         txn.set_commit();
         Ok(dwarves)
@@ -75,7 +75,7 @@ impl Datastore {
     }
 
     pub fn new_user(&self, user_name: String) -> Result<models::User, error::Error> {
-        let _ = self.conn.execute(queries::INSERT_USER, &[&user_name])?;
+        self.conn.execute(queries::INSERT_USER, &[&user_name])?;
         self.get_user(user_name)
     }
 
@@ -88,8 +88,8 @@ impl Datastore {
             models::DwarfStatus::Returned => return Err(error::Error::DwarfBusy(dwarf_id)),
         };
         let mine = get_mine(&txn, dwarf.town_id)?;
-        let _ = txn.execute(queries::SEND_DWARF_DIGGING, &[&dwarf.id, &mine.id]);
-        let _ = txn.execute(queries::MARK_MINE_STONE_LOSS, &[&mine.id])?;
+        txn.execute(queries::SEND_DWARF_DIGGING, &[&dwarf.id, &mine.id])?;
+        txn.execute(queries::MARK_MINE_STONE_LOSS, &[&mine.id])?;
         let dwarf2 = get_dwarf(&txn, dwarf_id)?;
         txn.set_commit();
         Ok(dwarf2)
