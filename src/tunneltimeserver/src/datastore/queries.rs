@@ -83,19 +83,6 @@ pub static UPDATE_STONE_STORAGE: &'static str = r#"
         storage_buildings.town_id = $1
 "#;
 
-pub static GET_DWARF_DIGGING_STONE: &'static str = r#"
-    SELECT
-        mines.stone_density as stone_count
-    FROM
-        dwarf_mine_trips
-    INNER JOIN
-        mines ON dwarf_mine_trips.mine_id = mines.id
-    WHERE
-        dwarf_mine_trips.finish_time < now()
-    AND
-        mines.town_id = $1
-"#;
-
 pub static DWARVES_BY_TOWN_ID: &'static str = r#"
 	SELECT
         dwarves.id,

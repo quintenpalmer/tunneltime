@@ -3,12 +3,7 @@ use tunneltimecore::models;
 use datastore::structs;
 
 impl structs::TownPlus {
-    pub fn into_model(
-        self,
-        gems: Vec<structs::GemPlus>,
-        mine: structs::Mine,
-        stones: Vec<structs::Stone>,
-    ) -> models::Town {
+    pub fn into_model(self, gems: Vec<structs::GemPlus>, mine: structs::Mine) -> models::Town {
         let gem_shop = match self.gem_shop_id {
             Some(_) => {
                 let gem_shop_gems = gems.into_iter().map(|x| x.into_model()).collect();
@@ -21,8 +16,7 @@ impl structs::TownPlus {
         let storage_building = models::StorageBuilding {
             id: self.storage_id,
             level: self.storage_level,
-            current_stone_count: self.storage_current_stone_count
-                + stones.iter().fold(0, |sum, val| sum + val.stone_count),
+            current_stone_count: self.storage_current_stone_count,
             max_stone_count: self.storage_max_stone_count,
         };
         models::Town {
