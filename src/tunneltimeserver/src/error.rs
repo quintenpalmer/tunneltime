@@ -14,6 +14,7 @@ pub enum Error {
     PostgresExtra(pg_extra::ExtraError),
     SelectManyOnOne(String),
     DwarfBusy(i32),
+    DwarfNotReturned(i32),
 }
 
 impl From<serde_json::Error> for Error {

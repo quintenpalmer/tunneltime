@@ -90,4 +90,5 @@ pub struct DwarfDigging {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum DwarfAction {
     Dig,
+    Retrieve,
 }

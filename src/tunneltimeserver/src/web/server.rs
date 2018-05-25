@@ -123,6 +123,10 @@ fn handle_dwarf_put(req: Request, ds: datastore::Datastore) -> types::ResponseFu
                 let dwarf = isetry!(ds.send_dwarf_digging(v.dwarf_id));
                 build_response(dwarf)
             }
+            models::DwarfAction::Retrieve => {
+                let dwarf = isetry!(ds.retrieve_dwarf(v.dwarf_id));
+                build_response(dwarf)
+            }
         }
     }))
 }

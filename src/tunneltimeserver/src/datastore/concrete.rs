@@ -94,6 +94,25 @@ impl Datastore {
         txn.set_commit();
         Ok(dwarf2)
     }
+
+    pub fn retrieve_dwarf(&self, dwarf_id: i32) -> Result<models::Dwarf, error::Error> {
+        let txn = self.conn.transaction()?;
+        let dwarf = get_dwarf(&txn, dwarf_id)?;
+        match dwarf.status {
+            models::DwarfStatus::Free => return Err(error::Error::DwarfNotReturned(dwarf_id)),
+            models::DwarfStatus::Digging => return Err(error::Error::DwarfNotReturned(dwarf_id)),
+            models::DwarfStatus::Returned => (),
+        };
+        let mine = get_mine(&txn, dwarf.town_id)?;
+        txn.execute(
+            queries::UPDATE_STONE_STORAGE,
+            &[&dwarf.town_id, &mine.stone_density],
+        )?;
+        txn.execute(queries::RETRIEVE_DWARF_DIGGING, &[&dwarf_id])?;
+        let dwarf2 = get_dwarf(&txn, dwarf_id)?;
+        txn.set_commit();
+        Ok(dwarf2)
+    }
 }
 
 fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, error::Error> {
