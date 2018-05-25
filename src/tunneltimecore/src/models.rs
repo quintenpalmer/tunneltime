@@ -84,4 +84,10 @@ pub struct NewUser {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DwarfDigging {
     pub dwarf_id: i32,
+    pub action: DwarfAction,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum DwarfAction {
+    Dig,
 }

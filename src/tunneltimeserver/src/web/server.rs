@@ -118,8 +118,12 @@ fn handle_dwarf_put(req: Request, ds: datastore::Datastore) -> types::ResponseFu
         let v: models::DwarfDigging = isetry!(
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
-        let dwarf = isetry!(ds.send_dwarf_digging(v.dwarf_id));
-        build_response(dwarf)
+        match v.action {
+            models::DwarfAction::Dig => {
+                let dwarf = isetry!(ds.send_dwarf_digging(v.dwarf_id));
+                build_response(dwarf)
+            }
+        }
     }))
 }
 
