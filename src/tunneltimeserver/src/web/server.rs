@@ -15,6 +15,7 @@ use url;
 
 use tunneltimecore::models;
 
+use web::responses;
 use web::types;
 
 use datastore;
@@ -38,25 +39,25 @@ impl Service for Handler {
         let resp = match req.uri().path() {
             "/health" => match req.method() {
                 hyper::Method::Get => handle_health(),
-                _ => return method_not_allowed(req.method()),
+                _ => return responses::method_not_allowed(req.method()),
             },
             "/api/users" => match req.method() {
                 hyper::Method::Get => handle_user_get(req, &conn),
                 hyper::Method::Post => handle_user_post(req, conn),
-                _ => return method_not_allowed(req.method()),
+                _ => return responses::method_not_allowed(req.method()),
             },
             "/api/towns" => match req.method() {
                 hyper::Method::Get => handle_town(&req, &conn),
                 hyper::Method::Post => handle_town_post(req, conn),
-                _ => return method_not_allowed(req.method()),
+                _ => return responses::method_not_allowed(req.method()),
             },
             "/api/dwarves" => match req.method() {
                 hyper::Method::Get => handle_dwarves(&req, &conn),
                 hyper::Method::Post => handle_dwarves_post(req, conn),
                 hyper::Method::Put => handle_dwarf_put(req, conn),
-                _ => return method_not_allowed(req.method()),
+                _ => return responses::method_not_allowed(req.method()),
             },
-            _ => return path_not_found(req.uri().path()),
+            _ => return responses::path_not_found(req.uri().path()),
         };
         resp
     }
@@ -117,8 +118,16 @@ fn handle_dwarf_put(req: Request, ds: datastore::Datastore) -> types::ResponseFu
         let v: models::DwarfDigging = isetry!(
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
-        let dwarf = isetry!(ds.send_dwarf_digging(v.dwarf_id));
-        build_response(dwarf)
+        match v.action {
+            models::DwarfAction::Dig => {
+                let dwarf = isetry!(ds.send_dwarf_digging(v.dwarf_id));
+                build_response(dwarf)
+            }
+            models::DwarfAction::Retrieve => {
+                let dwarf = isetry!(ds.retrieve_dwarf(v.dwarf_id));
+                build_response(dwarf)
+            }
+        }
     }))
 }
 
@@ -129,9 +138,9 @@ fn get_query_param<T: FromStr>(req: &Request, name: &str) -> Result<T, types::Re
     match params.get(name) {
         Some(val) => match val.parse() {
             Ok(v) => Ok(v),
-            Err(_) => Err(bad_request("missing user_name")),
+            Err(_) => Err(responses::bad_request("missing user_name")),
         },
-        None => Err(bad_request("missing user_name")),
+        None => Err(responses::bad_request("missing user_name")),
     }
 }
 
@@ -141,41 +150,5 @@ fn build_response<T: serde::Serialize>(ser: T) -> types::ResponseFuture {
         Response::new()
             .with_header(ContentLength(body.len() as u64))
             .with_body(body),
-    ))
-}
-
-const ROUTE_NOT_FOUND: &'static str = "Route Not Found";
-
-fn path_not_found(path: &str) -> types::ResponseFuture {
-    println!("{:?}", path);
-    Box::new(futures::future::ok(
-        Response::new()
-            .with_status(hyper::StatusCode::NotFound)
-            .with_header(ContentLength(ROUTE_NOT_FOUND.len() as u64))
-            .with_body(ROUTE_NOT_FOUND),
-    ))
-}
-
-const METHOD_NOT_ALLOWED: &'static str = "Method Not Allowed";
-
-fn method_not_allowed(method: &hyper::Method) -> types::ResponseFuture {
-    println!("{}", method);
-    Box::new(futures::future::ok(
-        Response::new()
-            .with_status(hyper::StatusCode::MethodNotAllowed)
-            .with_header(ContentLength(METHOD_NOT_ALLOWED.len() as u64))
-            .with_body(METHOD_NOT_ALLOWED),
-    ))
-}
-
-const BAD_REQUEST: &'static str = "Bad Request";
-
-fn bad_request(message: &str) -> types::ResponseFuture {
-    println!("{}", message);
-    Box::new(futures::future::ok(
-        Response::new()
-            .with_status(hyper::StatusCode::BadRequest)
-            .with_header(ContentLength(BAD_REQUEST.len() as u64))
-            .with_body(BAD_REQUEST),
     ))
 }

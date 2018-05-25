@@ -1,5 +1,6 @@
 #[macro_use]
 mod macros;
+mod responses;
 mod server;
 mod types;
 

@@ -74,17 +74,13 @@ pub static GEMS_BY_GEM_SHOP_ID_SQL: &'static str = r#"
         gem_shop_gems.gem_shop_id = $1
 "#;
 
-pub static GET_DWARF_DIGGING_STONE: &'static str = r#"
-    SELECT
-        mines.stone_density as stone_count
-    FROM
-        dwarf_mine_trips
-    INNER JOIN
-        mines ON dwarf_mine_trips.mine_id = mines.id
+pub static UPDATE_STONE_STORAGE: &'static str = r#"
+    UPDATE
+        storage_buildings
+    SET
+        current_stone_count=(current_stone_count + $2)
     WHERE
-        dwarf_mine_trips.finish_time < now()
-    AND
-        mines.town_id = $1
+        storage_buildings.town_id = $1
 "#;
 
 pub static DWARVES_BY_TOWN_ID: &'static str = r#"
@@ -156,4 +152,20 @@ pub static SEND_DWARF_DIGGING: &'static str = r#"
     INSERT INTO
         dwarf_mine_trips (dwarf_id, mine_id, finish_time)
     VALUES ($1, $2, now() + '1 minute')
+"#;
+
+pub static RETRIEVE_DWARF_DIGGING: &'static str = r#"
+	DELETE FROM
+        dwarf_mine_trips
+    WHERE
+        dwarf_id = $1
+"#;
+
+pub static MARK_MINE_STONE_LOSS: &'static str = r#"
+    UPDATE
+        mines
+    SET
+        total_stone = (total_stone - stone_density)
+    WHERE
+        id = $1
 "#;
