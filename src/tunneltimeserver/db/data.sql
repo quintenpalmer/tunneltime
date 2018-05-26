@@ -149,6 +149,7 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 --
 
 COPY public.items (id, name) FROM stdin;
+1	stone
 \.
 
 
@@ -156,7 +157,7 @@ COPY public.items (id, name) FROM stdin;
 -- Name: items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.items_id_seq', 1, false);
+SELECT pg_catalog.setval('public.items_id_seq', 1, true);
 
 
 --
