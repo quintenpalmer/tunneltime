@@ -145,6 +145,21 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 
 
 --
+-- Data for Name: items; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.items (id, name) FROM stdin;
+\.
+
+
+--
+-- Name: items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.items_id_seq', 1, false);
+
+
+--
 -- Name: mines_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
@@ -187,6 +202,37 @@ COPY public.storage_buildings (id, town_id, level, current_stone_count) FROM std
 --
 
 SELECT pg_catalog.setval('public.storage_buildings_id_seq', 5, true);
+
+
+--
+-- Data for Name: store_fronts; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.store_fronts (id, town_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: store_front_buying_items; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.store_front_buying_items (store_front_id, item_id, gold) FROM stdin;
+\.
+
+
+--
+-- Data for Name: store_front_selling_items; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.store_front_selling_items (store_front_id, item_id, gold) FROM stdin;
+\.
+
+
+--
+-- Name: store_fronts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.store_fronts_id_seq', 1, false);
 
 
 --
