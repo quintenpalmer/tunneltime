@@ -12,6 +12,7 @@ pub enum Error {
     Hyper(hyper::Error),
     Postgres(pg::error::Error),
     PostgresExtra(pg_extra::ExtraError),
+    NoSqlRows,
     SelectManyOnOne(String),
     DwarfBusy(i32),
     DwarfNotReturned(i32),

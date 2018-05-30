@@ -40,6 +40,8 @@ macro_rules! town_base_sql {
 
 pub static TOWN_BY_USER_ID_SQL: &'static str = concat!(town_base_sql!(), "WHERE user_id = $1");
 
+pub static TOWN_BY_TOWN_ID_SQL: &'static str = concat!(town_base_sql!(), "WHERE towns.id = $1");
+
 pub static MINES_BY_TOWN_ID: &'static str = r#"
     SELECT
         mines.id,
@@ -170,4 +172,42 @@ pub static MARK_MINE_STONE_LOSS: &'static str = r#"
         total_stone = (total_stone - stone_density)
     WHERE
         id = $1
+"#;
+
+pub static GET_STORE_FRONT_BY_TOWN_ID: &'static str = r#"
+    SELECT
+        id,
+        town_id
+    FROM
+        store_fronts
+    WHERE
+        town_id = $1
+"#;
+
+pub static GET_STORE_BUYING_ITEMS: &'static str = r#"
+    SELECT
+        sfbi.store_front_id,
+        sfbi.item_id,
+        items.name as item_name,
+        sfbi.gold
+    FROM
+        store_front_buying_items sfbi
+    INNER JOIN
+        items on items.id = sfbi.item_id
+    WHERE
+        sfbi.store_front_id = $1
+"#;
+
+pub static GET_STORE_SELLING_ITEMS: &'static str = r#"
+    SELECT
+        sfsi.store_front_id,
+        sfsi.item_id,
+        items.name as item_name,
+        sfsi.gold
+    FROM
+        store_front_selling_items sfsi
+    INNER JOIN
+        items on items.id = sfsi.item_id
+    WHERE
+        sfsi.store_front_id = $1
 "#;

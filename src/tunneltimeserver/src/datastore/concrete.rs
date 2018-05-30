@@ -115,6 +115,30 @@ impl Datastore {
     }
 }
 
+fn get_town_by_town_id(
+    ds: &pg::GenericConnection,
+    town_id: i32,
+) -> Result<models::Town, error::Error> {
+    let town: structs::TownPlus = selects::select_one_by_field(
+        ds,
+        "towns".to_string(),
+        queries::TOWN_BY_TOWN_ID_SQL,
+        town_id,
+    )?;
+    let gems = {
+        match town.gem_shop_id {
+            Some(gem_shop_id) => {
+                selects::select_by_field(ds, queries::GEMS_BY_GEM_SHOP_ID_SQL, gem_shop_id)?
+            }
+            None => Vec::new(),
+        }
+    };
+    let mine = get_mine(ds, town.town_id)?;
+    let store_front = get_store_front(ds, town.town_id)?;
+
+    Ok(town.into_model(gems, mine, store_front))
+}
+
 fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, error::Error> {
     let town: structs::TownPlus = selects::select_one_by_field(
         ds,
@@ -131,8 +155,9 @@ fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, er
         }
     };
     let mine = get_mine(ds, town.town_id)?;
+    let store_front = get_store_front(ds, town.town_id)?;
 
-    Ok(town.into_model(gems, mine))
+    Ok(town.into_model(gems, mine, store_front))
 }
 
 fn get_mine(ds: &pg::GenericConnection, town_id: i32) -> Result<structs::Mine, error::Error> {
@@ -155,4 +180,24 @@ fn get_dwarf(ds: &pg::GenericConnection, dwarf_id: i32) -> Result<models::Dwarf,
         selects::select_one_by_field(ds, "dwarves".to_string(), queries::DWARF_BY_ID, dwarf_id)?;
     let model_dwarf = dwarf.into_model();
     Ok(model_dwarf)
+}
+
+fn get_store_front(
+    ds: &pg::GenericConnection,
+    town_id: i32,
+) -> Result<Option<models::StoreFront>, error::Error> {
+    let store_front: structs::StoreFront = match selects::select_maybe_one_by_field(
+        ds,
+        "store_fronts".to_string(),
+        queries::GET_STORE_FRONT_BY_TOWN_ID,
+        town_id,
+    )? {
+        Some(sf) => sf,
+        None => return Ok(None),
+    };
+    let buying: Vec<structs::ItemInStore> =
+        selects::select_by_field(ds, queries::GET_STORE_BUYING_ITEMS, store_front.id)?;
+    let selling: Vec<structs::ItemInStore> =
+        selects::select_by_field(ds, queries::GET_STORE_SELLING_ITEMS, store_front.id)?;
+    Ok(Some(store_front.into_model(buying, selling)))
 }

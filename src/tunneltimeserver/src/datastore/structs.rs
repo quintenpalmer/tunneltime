@@ -31,12 +31,26 @@ pub struct Stone {
     pub stone_count: i32,
 }
 
+#[derive(Debug, FromRow)]
+pub struct ItemInStore {
+    pub item_id: i32,
+    pub item_name: String,
+    pub store_front_id: i32,
+    pub gold: i32,
+}
+
 // Raw Structs
 
 #[derive(Debug, FromRow)]
 pub struct User {
     pub id: i32,
     pub user_name: String,
+}
+
+#[derive(Debug, FromRow)]
+pub struct StoreFront {
+    pub id: i32,
+    pub town_id: i32,
 }
 
 #[derive(Debug, FromRow)]
