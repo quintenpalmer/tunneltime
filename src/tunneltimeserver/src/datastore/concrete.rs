@@ -47,6 +47,14 @@ impl Datastore {
         return get_town(&self.conn, user_id);
     }
 
+    pub fn get_store_front(
+        &self,
+        user_id: i32,
+    ) -> Result<Option<models::StoreFront>, error::Error> {
+        let town = get_town(&self.conn, user_id)?;
+        get_store_front(&self.conn, town.id)
+    }
+
     pub fn purchase_store_front(&self, town_id: i32) -> Result<models::Town, error::Error> {
         let txn = self.conn.transaction()?;
         txn.execute(queries::UPDATE_STONE_STORAGE, &[&town_id, &-40])?;

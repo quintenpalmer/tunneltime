@@ -52,6 +52,10 @@ impl Service for Handler {
                 hyper::Method::Put => handle_town_put(req, conn),
                 _ => return responses::method_not_allowed(req.method()),
             },
+            "/api/towns/store_front" => match req.method() {
+                hyper::Method::Get => handle_store_front(req, conn),
+                _ => return responses::method_not_allowed(req.method()),
+            },
             "/api/dwarves" => match req.method() {
                 hyper::Method::Get => handle_dwarves(&req, &conn),
                 hyper::Method::Post => handle_dwarves_post(req, conn),
@@ -109,6 +113,11 @@ fn handle_town_put(req: Request, ds: datastore::Datastore) -> types::ResponseFut
         };
         build_response(town)
     }))
+}
+
+fn handle_store_front(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
+    let user_id: i32 = rtry!(get_query_param(&req, "user_id"));
+    build_response(isetry!(ds.get_store_front(user_id)))
 }
 
 fn handle_dwarves(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
