@@ -47,6 +47,21 @@ impl Datastore {
         return get_town(&self.conn, user_id);
     }
 
+    pub fn purchase_store_front(&self, town_id: i32) -> Result<models::Town, error::Error> {
+        let txn = self.conn.transaction()?;
+        txn.execute(queries::UPDATE_STONE_STORAGE, &[&town_id, &-40])?;
+        txn.execute(queries::INSERT_STORE_FRONT, &[&town_id])?;
+        let sf = match get_store_front(&txn, town_id)? {
+            Some(v) => v,
+            None => return Err(error::Error::NoSqlRows),
+        };
+        txn.execute(queries::INSERT_STORE_FRONT_BUYING, &[&sf.id, &1, &2])?;
+        txn.execute(queries::INSERT_STORE_FRONT_SELLING, &[&sf.id, &1, &1])?;
+        let ret_town = get_town_by_town_id(&txn, town_id)?;
+        txn.set_commit();
+        Ok(ret_town)
+    }
+
     pub fn recruit_dwarf(
         &self,
         town_id: i32,

@@ -115,6 +115,27 @@ pub static DWARF_BY_ID: &'static str = r#"
         dwarves.id = $1
 "#;
 
+pub static INSERT_STORE_FRONT: &'static str = r#"
+    INSERT INTO
+        store_fronts (town_id)
+    VALUES
+        ($1)
+"#;
+
+pub static INSERT_STORE_FRONT_BUYING: &'static str = r#"
+    INSERT INTO
+        store_front_buying_items (store_front_id, item_id, gold)
+    VALUES
+        ($1, $2, $3)
+"#;
+
+pub static INSERT_STORE_FRONT_SELLING: &'static str = r#"
+    INSERT INTO
+        store_front_selling_items (store_front_id, item_id, gold)
+    VALUES
+        ($1, $2, $3)
+"#;
+
 pub static INSERT_USER: &'static str = r#"
     INSERT INTO
         users (user_name)

@@ -97,6 +97,17 @@ pub struct NewUser {
 // PUT bodies
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct TownPut {
+    pub town_id: i32,
+    pub town_action: TownAction,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum TownAction {
+    PurchaseStoreFront,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DwarfDigging {
     pub dwarf_id: i32,
     pub action: DwarfAction,

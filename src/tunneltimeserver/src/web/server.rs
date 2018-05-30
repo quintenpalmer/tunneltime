@@ -49,6 +49,7 @@ impl Service for Handler {
             "/api/towns" => match req.method() {
                 hyper::Method::Get => handle_town(&req, &conn),
                 hyper::Method::Post => handle_town_post(req, conn),
+                hyper::Method::Put => handle_town_put(req, conn),
                 _ => return responses::method_not_allowed(req.method()),
             },
             "/api/dwarves" => match req.method() {
@@ -94,6 +95,18 @@ fn handle_town_post(req: Request, ds: datastore::Datastore) -> types::ResponseFu
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
         let town = isetry!(ds.new_town(v.user_id));
+        build_response(town)
+    }))
+}
+
+fn handle_town_put(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
+    Box::new(req.body().concat2().and_then(move |chunk| {
+        let v: models::TownPut = isetry!(
+            serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
+        );
+        let town = match v.town_action {
+            models::TownAction::PurchaseStoreFront => isetry!(ds.purchase_store_front(v.town_id)),
+        };
         build_response(town)
     }))
 }
