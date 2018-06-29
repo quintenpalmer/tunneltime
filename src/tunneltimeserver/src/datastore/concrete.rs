@@ -77,7 +77,7 @@ impl Datastore {
     ) -> Result<Vec<models::Dwarf>, error::Error> {
         let txn = self.conn.transaction()?;
         txn.execute(queries::INSERT_DWARF, &[&town_id, &dwarf_name])?;
-        txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id])?;
+        txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id, &-20])?;
         let dwarves = get_dwarves(&txn, town_id)?;
         txn.set_commit();
         Ok(dwarves)

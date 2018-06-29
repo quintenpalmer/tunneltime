@@ -58,7 +58,7 @@ pub static UPDATE_TOWN_GOLD: &'static str = r#"
     UPDATE
         towns
     SET
-        gold=towns.gold-20
+        gold=towns.gold+$2
     WHERE
         id=$1
 "#;
