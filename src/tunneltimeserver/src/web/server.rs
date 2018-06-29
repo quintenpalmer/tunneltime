@@ -54,6 +54,7 @@ impl Service for Handler {
             },
             "/api/towns/store_front" => match req.method() {
                 hyper::Method::Get => handle_store_front(req, conn),
+                hyper::Method::Put => handle_store_front_put(req, conn),
                 _ => return responses::method_not_allowed(req.method()),
             },
             "/api/dwarves" => match req.method() {
@@ -118,6 +119,16 @@ fn handle_town_put(req: Request, ds: datastore::Datastore) -> types::ResponseFut
 fn handle_store_front(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
     let user_id: i32 = rtry!(get_query_param(&req, "user_id"));
     build_response(isetry!(ds.get_store_front(user_id)))
+}
+
+fn handle_store_front_put(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
+    Box::new(req.body().concat2().and_then(move |chunk| {
+        let v: models::PurchasePayload = isetry!(
+            serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
+        );
+        let town = isetry!(ds.purchase_item(v.town_id, v.to_purchase, v.count));
+        build_response(town)
+    }))
 }
 
 fn handle_dwarves(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {

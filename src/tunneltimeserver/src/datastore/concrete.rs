@@ -70,6 +70,26 @@ impl Datastore {
         Ok(ret_town)
     }
 
+    pub fn purchase_item(
+        &self,
+        town_id: i32,
+        item: models::Item,
+        count: i32,
+    ) -> Result<models::Town, error::Error> {
+        let txn = self.conn.transaction()?;
+        let town = get_town_by_town_id(&txn, town_id)?;
+        let store_front = town.store_front.unwrap();
+        let buying_price = store_front.buying.get(&item).unwrap();
+        txn.execute(queries::UPDATE_STONE_STORAGE, &[&town_id, &count])?;
+        txn.execute(
+            queries::UPDATE_TOWN_GOLD,
+            &[&town_id, &-(buying_price * count)],
+        )?;
+        let ret_town = get_town_by_town_id(&txn, town_id)?;
+        txn.set_commit();
+        Ok(ret_town)
+    }
+
     pub fn recruit_dwarf(
         &self,
         town_id: i32,

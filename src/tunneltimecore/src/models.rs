@@ -97,6 +97,13 @@ pub struct NewUser {
 // PUT bodies
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct PurchasePayload {
+    pub town_id: i32,
+    pub to_purchase: Item,
+    pub count: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TownPut {
     pub town_id: i32,
     pub town_action: TownAction,
