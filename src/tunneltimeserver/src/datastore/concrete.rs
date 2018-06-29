@@ -73,17 +73,30 @@ impl Datastore {
     pub fn purchase_item(
         &self,
         town_id: i32,
+        action: models::StoreInteractionAction,
         item: models::Item,
         count: i32,
     ) -> Result<models::Town, error::Error> {
         let txn = self.conn.transaction()?;
         let town = get_town_by_town_id(&txn, town_id)?;
         let store_front = town.store_front.unwrap();
-        let buying_price = store_front.buying.get(&item).unwrap();
-        txn.execute(queries::UPDATE_STONE_STORAGE, &[&town_id, &count])?;
+        let (buy_or_sell, price) = match action {
+            models::StoreInteractionAction::Buy => {
+                let buying_price = store_front.buying.get(&item).unwrap();
+                (1, buying_price)
+            }
+            models::StoreInteractionAction::Sell => {
+                let selling_price = store_front.selling.get(&item).unwrap();
+                (-1, selling_price)
+            }
+        };
+        txn.execute(
+            queries::UPDATE_STONE_STORAGE,
+            &[&town_id, &(buy_or_sell * count)],
+        )?;
         txn.execute(
             queries::UPDATE_TOWN_GOLD,
-            &[&town_id, &-(buying_price * count)],
+            &[&town_id, &-(buy_or_sell * price * count)],
         )?;
         let ret_town = get_town_by_town_id(&txn, town_id)?;
         txn.set_commit();

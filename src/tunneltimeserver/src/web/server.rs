@@ -123,10 +123,10 @@ fn handle_store_front(req: Request, ds: datastore::Datastore) -> types::Response
 
 fn handle_store_front_put(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
     Box::new(req.body().concat2().and_then(move |chunk| {
-        let v: models::PurchasePayload = isetry!(
+        let v: models::StoreInteractionPayload = isetry!(
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
-        let town = isetry!(ds.purchase_item(v.town_id, v.to_purchase, v.count));
+        let town = isetry!(ds.purchase_item(v.town_id, v.action, v.item, v.count));
         build_response(town)
     }))
 }

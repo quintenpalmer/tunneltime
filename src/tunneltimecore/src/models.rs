@@ -97,10 +97,17 @@ pub struct NewUser {
 // PUT bodies
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct PurchasePayload {
+pub struct StoreInteractionPayload {
     pub town_id: i32,
-    pub to_purchase: Item,
+    pub action: StoreInteractionAction,
+    pub item: Item,
     pub count: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum StoreInteractionAction {
+    Buy,
+    Sell,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
