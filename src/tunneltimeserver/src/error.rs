@@ -17,6 +17,7 @@ pub enum Error {
     SelectManyOnOne(String),
     DwarfBusy(i32),
     DwarfNotReturned(i32),
+    StoreFrontNotPurchased(i32),
     StoreDoesNotHaveItem(models::Item),
 }
 

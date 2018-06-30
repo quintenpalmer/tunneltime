@@ -79,7 +79,8 @@ impl Datastore {
     ) -> Result<models::Town, error::Error> {
         let txn = self.conn.transaction()?;
         let town = get_town_by_town_id(&txn, town_id)?;
-        let store_front = town.store_front.unwrap();
+        let store_front = town.store_front
+            .ok_or(error::Error::StoreFrontNotPurchased(town_id))?;
         let (buy_or_sell, price) = match action {
             models::StoreInteractionAction::Buy => {
                 let buying_price = store_front
