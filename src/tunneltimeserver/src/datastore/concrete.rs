@@ -47,6 +47,69 @@ impl Datastore {
         return get_town(&self.conn, user_id);
     }
 
+    pub fn get_store_front(
+        &self,
+        user_id: i32,
+    ) -> Result<Option<models::StoreFront>, error::Error> {
+        let town = get_town(&self.conn, user_id)?;
+        get_store_front(&self.conn, town.id)
+    }
+
+    pub fn purchase_store_front(&self, town_id: i32) -> Result<models::Town, error::Error> {
+        let txn = self.conn.transaction()?;
+        txn.execute(queries::UPDATE_STONE_STORAGE, &[&town_id, &-40])?;
+        txn.execute(queries::INSERT_STORE_FRONT, &[&town_id])?;
+        let sf = match get_store_front(&txn, town_id)? {
+            Some(v) => v,
+            None => return Err(error::Error::NoSqlRows),
+        };
+        txn.execute(queries::INSERT_STORE_FRONT_BUYING, &[&sf.id, &1, &2])?;
+        txn.execute(queries::INSERT_STORE_FRONT_SELLING, &[&sf.id, &1, &1])?;
+        let ret_town = get_town_by_town_id(&txn, town_id)?;
+        txn.set_commit();
+        Ok(ret_town)
+    }
+
+    pub fn purchase_item(
+        &self,
+        town_id: i32,
+        action: models::StoreInteractionAction,
+        item: models::Item,
+        count: i32,
+    ) -> Result<models::Town, error::Error> {
+        let txn = self.conn.transaction()?;
+        let town = get_town_by_town_id(&txn, town_id)?;
+        let store_front = town.store_front
+            .ok_or(error::Error::StoreFrontNotPurchased(town_id))?;
+        let (buy_or_sell, price) = match action {
+            models::StoreInteractionAction::Buy => {
+                let buying_price = store_front
+                    .buying
+                    .get(&item)
+                    .ok_or(error::Error::StoreDoesNotHaveItem(item))?;
+                (1, buying_price)
+            }
+            models::StoreInteractionAction::Sell => {
+                let selling_price = store_front
+                    .selling
+                    .get(&item)
+                    .ok_or(error::Error::StoreDoesNotHaveItem(item))?;
+                (-1, selling_price)
+            }
+        };
+        txn.execute(
+            queries::UPDATE_STONE_STORAGE,
+            &[&town_id, &(buy_or_sell * count)],
+        )?;
+        txn.execute(
+            queries::UPDATE_TOWN_GOLD,
+            &[&town_id, &-(buy_or_sell * price * count)],
+        )?;
+        let ret_town = get_town_by_town_id(&txn, town_id)?;
+        txn.set_commit();
+        Ok(ret_town)
+    }
+
     pub fn recruit_dwarf(
         &self,
         town_id: i32,
@@ -54,7 +117,7 @@ impl Datastore {
     ) -> Result<Vec<models::Dwarf>, error::Error> {
         let txn = self.conn.transaction()?;
         txn.execute(queries::INSERT_DWARF, &[&town_id, &dwarf_name])?;
-        txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id])?;
+        txn.execute(queries::UPDATE_TOWN_GOLD, &[&town_id, &-20])?;
         let dwarves = get_dwarves(&txn, town_id)?;
         txn.set_commit();
         Ok(dwarves)
@@ -115,6 +178,30 @@ impl Datastore {
     }
 }
 
+fn get_town_by_town_id(
+    ds: &pg::GenericConnection,
+    town_id: i32,
+) -> Result<models::Town, error::Error> {
+    let town: structs::TownPlus = selects::select_one_by_field(
+        ds,
+        "towns".to_string(),
+        queries::TOWN_BY_TOWN_ID_SQL,
+        town_id,
+    )?;
+    let gems = {
+        match town.gem_shop_id {
+            Some(gem_shop_id) => {
+                selects::select_by_field(ds, queries::GEMS_BY_GEM_SHOP_ID_SQL, gem_shop_id)?
+            }
+            None => Vec::new(),
+        }
+    };
+    let mine = get_mine(ds, town.town_id)?;
+    let store_front = get_store_front(ds, town.town_id)?;
+
+    Ok(town.into_model(gems, mine, store_front))
+}
+
 fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, error::Error> {
     let town: structs::TownPlus = selects::select_one_by_field(
         ds,
@@ -131,8 +218,9 @@ fn get_town(ds: &pg::GenericConnection, user_id: i32) -> Result<models::Town, er
         }
     };
     let mine = get_mine(ds, town.town_id)?;
+    let store_front = get_store_front(ds, town.town_id)?;
 
-    Ok(town.into_model(gems, mine))
+    Ok(town.into_model(gems, mine, store_front))
 }
 
 fn get_mine(ds: &pg::GenericConnection, town_id: i32) -> Result<structs::Mine, error::Error> {
@@ -155,4 +243,24 @@ fn get_dwarf(ds: &pg::GenericConnection, dwarf_id: i32) -> Result<models::Dwarf,
         selects::select_one_by_field(ds, "dwarves".to_string(), queries::DWARF_BY_ID, dwarf_id)?;
     let model_dwarf = dwarf.into_model();
     Ok(model_dwarf)
+}
+
+fn get_store_front(
+    ds: &pg::GenericConnection,
+    town_id: i32,
+) -> Result<Option<models::StoreFront>, error::Error> {
+    let store_front: structs::StoreFront = match selects::select_maybe_one_by_field(
+        ds,
+        "store_fronts".to_string(),
+        queries::GET_STORE_FRONT_BY_TOWN_ID,
+        town_id,
+    )? {
+        Some(sf) => sf,
+        None => return Ok(None),
+    };
+    let buying: Vec<structs::ItemInStore> =
+        selects::select_by_field(ds, queries::GET_STORE_BUYING_ITEMS, store_front.id)?;
+    let selling: Vec<structs::ItemInStore> =
+        selects::select_by_field(ds, queries::GET_STORE_SELLING_ITEMS, store_front.id)?;
+    Ok(Some(store_front.into_model(buying, selling)))
 }

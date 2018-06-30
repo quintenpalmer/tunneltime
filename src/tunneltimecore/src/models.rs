@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: i32,
@@ -8,6 +10,7 @@ pub struct User {
 pub struct Town {
     pub id: i32,
     pub gem_shop: Option<GemShop>,
+    pub store_front: Option<StoreFront>,
     pub storage_building: StorageBuilding,
     pub mine: Mine,
     pub gold: i32,
@@ -30,6 +33,18 @@ pub struct StorageBuilding {
 pub struct Mine {
     pub total_stone: i32,
     pub stone_density: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StoreFront {
+    pub id: i32,
+    pub selling: BTreeMap<Item, i32>,
+    pub buying: BTreeMap<Item, i32>,
+}
+
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Serialize, Deserialize)]
+pub enum Item {
+    Stone,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -80,6 +95,31 @@ pub struct NewUser {
 }
 
 // PUT bodies
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StoreInteractionPayload {
+    pub town_id: i32,
+    pub action: StoreInteractionAction,
+    pub item: Item,
+    pub count: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum StoreInteractionAction {
+    Buy,
+    Sell,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TownPut {
+    pub town_id: i32,
+    pub town_action: TownAction,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum TownAction {
+    PurchaseStoreFront,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DwarfDigging {

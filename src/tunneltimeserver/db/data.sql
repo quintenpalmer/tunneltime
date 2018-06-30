@@ -23,6 +23,7 @@ COPY public.dwarves (id, town_id, name) FROM stdin;
 1	1	Idrigoth
 2	1	Magni
 7	1	Prudent
+8	1	Depala
 \.
 
 
@@ -46,9 +47,9 @@ COPY public.users (id, user_name) FROM stdin;
 COPY public.towns (id, user_id, gold) FROM stdin;
 2	2	100
 3	3	100
-1	1	80
 4	4	100
 5	5	100
+1	1	60
 \.
 
 
@@ -57,11 +58,11 @@ COPY public.towns (id, user_id, gold) FROM stdin;
 --
 
 COPY public.mines (id, town_id, total_stone, stone_density) FROM stdin;
-1	1	1000	5
 2	2	1000	5
 3	3	1000	5
 4	4	1000	5
 5	5	1000	5
+1	1	965	5
 \.
 
 
@@ -77,7 +78,7 @@ COPY public.dwarf_mine_trips (dwarf_id, mine_id, finish_time) FROM stdin;
 -- Name: dwarves_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
-SELECT pg_catalog.setval('public.dwarves_id_seq', 7, true);
+SELECT pg_catalog.setval('public.dwarves_id_seq', 9, true);
 
 
 --
@@ -144,6 +145,22 @@ SELECT pg_catalog.setval('public.gems_id_seq', 3, true);
 
 
 --
+-- Data for Name: items; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.items (id, name) FROM stdin;
+1	stone
+\.
+
+
+--
+-- Name: items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.items_id_seq', 1, true);
+
+
+--
 -- Name: mines_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
 --
 
@@ -174,10 +191,10 @@ COPY public.storage_building_levels (level, max_stone_count) FROM stdin;
 
 COPY public.storage_buildings (id, town_id, level, current_stone_count) FROM stdin;
 1	4	1	0
-2	1	1	0
 3	2	1	0
 4	3	1	0
 5	5	1	0
+2	1	1	35
 \.
 
 
@@ -186,6 +203,37 @@ COPY public.storage_buildings (id, town_id, level, current_stone_count) FROM std
 --
 
 SELECT pg_catalog.setval('public.storage_buildings_id_seq', 5, true);
+
+
+--
+-- Data for Name: store_fronts; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.store_fronts (id, town_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: store_front_buying_items; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.store_front_buying_items (store_front_id, item_id, gold) FROM stdin;
+\.
+
+
+--
+-- Data for Name: store_front_selling_items; Type: TABLE DATA; Schema: public; Owner: tunneltime_user
+--
+
+COPY public.store_front_selling_items (store_front_id, item_id, gold) FROM stdin;
+\.
+
+
+--
+-- Name: store_fronts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tunneltime_user
+--
+
+SELECT pg_catalog.setval('public.store_fronts_id_seq', 1, false);
 
 
 --

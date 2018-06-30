@@ -193,6 +193,39 @@ ALTER SEQUENCE public.gems_id_seq OWNED BY public.gems.id;
 
 
 --
+-- Name: items; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.items (
+    id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE public.items OWNER TO tunneltime_user;
+
+--
+-- Name: items_id_seq; Type: SEQUENCE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE SEQUENCE public.items_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.items_id_seq OWNER TO tunneltime_user;
+
+--
+-- Name: items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: tunneltime_user
+--
+
+ALTER SEQUENCE public.items_id_seq OWNED BY public.items.id;
+
+
+--
 -- Name: mines; Type: TABLE; Schema: public; Owner: tunneltime_user
 --
 
@@ -276,6 +309,65 @@ ALTER TABLE public.storage_buildings_id_seq OWNER TO tunneltime_user;
 --
 
 ALTER SEQUENCE public.storage_buildings_id_seq OWNED BY public.storage_buildings.id;
+
+
+--
+-- Name: store_front_buying_items; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.store_front_buying_items (
+    store_front_id integer NOT NULL,
+    item_id integer NOT NULL,
+    gold integer NOT NULL
+);
+
+
+ALTER TABLE public.store_front_buying_items OWNER TO tunneltime_user;
+
+--
+-- Name: store_front_selling_items; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.store_front_selling_items (
+    store_front_id integer NOT NULL,
+    item_id integer NOT NULL,
+    gold integer NOT NULL
+);
+
+
+ALTER TABLE public.store_front_selling_items OWNER TO tunneltime_user;
+
+--
+-- Name: store_fronts; Type: TABLE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE TABLE public.store_fronts (
+    id integer NOT NULL,
+    town_id integer NOT NULL
+);
+
+
+ALTER TABLE public.store_fronts OWNER TO tunneltime_user;
+
+--
+-- Name: store_fronts_id_seq; Type: SEQUENCE; Schema: public; Owner: tunneltime_user
+--
+
+CREATE SEQUENCE public.store_fronts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.store_fronts_id_seq OWNER TO tunneltime_user;
+
+--
+-- Name: store_fronts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: tunneltime_user
+--
+
+ALTER SEQUENCE public.store_fronts_id_seq OWNED BY public.store_fronts.id;
 
 
 --
@@ -375,6 +467,13 @@ ALTER TABLE ONLY public.gems ALTER COLUMN id SET DEFAULT nextval('public.gems_id
 
 
 --
+-- Name: items id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.items ALTER COLUMN id SET DEFAULT nextval('public.items_id_seq'::regclass);
+
+
+--
 -- Name: mines id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
 --
 
@@ -386,6 +485,13 @@ ALTER TABLE ONLY public.mines ALTER COLUMN id SET DEFAULT nextval('public.mines_
 --
 
 ALTER TABLE ONLY public.storage_buildings ALTER COLUMN id SET DEFAULT nextval('public.storage_buildings_id_seq'::regclass);
+
+
+--
+-- Name: store_fronts id; Type: DEFAULT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_fronts ALTER COLUMN id SET DEFAULT nextval('public.store_fronts_id_seq'::regclass);
 
 
 --
@@ -459,6 +565,22 @@ ALTER TABLE ONLY public.gems
 
 
 --
+-- Name: items items_name_key; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.items
+    ADD CONSTRAINT items_name_key UNIQUE (name);
+
+
+--
+-- Name: items items_pkey; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.items
+    ADD CONSTRAINT items_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: mines mines_pkey; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
 --
 
@@ -480,6 +602,38 @@ ALTER TABLE ONLY public.storage_building_levels
 
 ALTER TABLE ONLY public.storage_buildings
     ADD CONSTRAINT storage_buildings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_front_buying_items store_front_buying_items_store_front_id_item_id_key; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_front_buying_items
+    ADD CONSTRAINT store_front_buying_items_store_front_id_item_id_key UNIQUE (store_front_id, item_id);
+
+
+--
+-- Name: store_front_selling_items store_front_selling_items_store_front_id_item_id_key; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_front_selling_items
+    ADD CONSTRAINT store_front_selling_items_store_front_id_item_id_key UNIQUE (store_front_id, item_id);
+
+
+--
+-- Name: store_fronts store_fronts_pkey; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_fronts
+    ADD CONSTRAINT store_fronts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_fronts store_fronts_town_id_key; Type: CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_fronts
+    ADD CONSTRAINT store_fronts_town_id_key UNIQUE (town_id);
 
 
 --
@@ -584,6 +738,46 @@ ALTER TABLE ONLY public.storage_buildings
 
 ALTER TABLE ONLY public.storage_buildings
     ADD CONSTRAINT storage_buildings_town_id_fkey FOREIGN KEY (town_id) REFERENCES public.towns(id);
+
+
+--
+-- Name: store_front_buying_items store_front_buying_items_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_front_buying_items
+    ADD CONSTRAINT store_front_buying_items_item_id_fkey FOREIGN KEY (item_id) REFERENCES public.items(id);
+
+
+--
+-- Name: store_front_buying_items store_front_buying_items_store_front_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_front_buying_items
+    ADD CONSTRAINT store_front_buying_items_store_front_id_fkey FOREIGN KEY (store_front_id) REFERENCES public.store_fronts(id);
+
+
+--
+-- Name: store_front_selling_items store_front_selling_items_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_front_selling_items
+    ADD CONSTRAINT store_front_selling_items_item_id_fkey FOREIGN KEY (item_id) REFERENCES public.items(id);
+
+
+--
+-- Name: store_front_selling_items store_front_selling_items_store_front_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_front_selling_items
+    ADD CONSTRAINT store_front_selling_items_store_front_id_fkey FOREIGN KEY (store_front_id) REFERENCES public.store_fronts(id);
+
+
+--
+-- Name: store_fronts store_fronts_town_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: tunneltime_user
+--
+
+ALTER TABLE ONLY public.store_fronts
+    ADD CONSTRAINT store_fronts_town_id_fkey FOREIGN KEY (town_id) REFERENCES public.towns(id);
 
 
 --

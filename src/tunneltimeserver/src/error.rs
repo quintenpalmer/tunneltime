@@ -3,6 +3,7 @@ use postgres as pg;
 use postgres_extra as pg_extra;
 use serde_json;
 use std::io;
+use tunneltimecore::models;
 
 #[derive(Debug)]
 pub enum Error {
@@ -12,9 +13,12 @@ pub enum Error {
     Hyper(hyper::Error),
     Postgres(pg::error::Error),
     PostgresExtra(pg_extra::ExtraError),
+    NoSqlRows,
     SelectManyOnOne(String),
     DwarfBusy(i32),
     DwarfNotReturned(i32),
+    StoreFrontNotPurchased(i32),
+    StoreDoesNotHaveItem(models::Item),
 }
 
 impl From<serde_json::Error> for Error {

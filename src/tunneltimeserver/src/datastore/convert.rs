@@ -3,7 +3,12 @@ use tunneltimecore::models;
 use datastore::structs;
 
 impl structs::TownPlus {
-    pub fn into_model(self, gems: Vec<structs::GemPlus>, mine: structs::Mine) -> models::Town {
+    pub fn into_model(
+        self,
+        gems: Vec<structs::GemPlus>,
+        mine: structs::Mine,
+        store_front: Option<models::StoreFront>,
+    ) -> models::Town {
         let gem_shop = match self.gem_shop_id {
             Some(_) => {
                 let gem_shop_gems = gems.into_iter().map(|x| x.into_model()).collect();
@@ -24,6 +29,7 @@ impl structs::TownPlus {
             gem_shop: gem_shop,
             storage_building: storage_building,
             mine: mine.into_model(),
+            store_front: store_front,
             gold: self.gold,
         }
     }
@@ -64,6 +70,31 @@ impl structs::DwarfPlus {
                 None => models::DwarfStatus::Free,
             },
             town_id: self.town_id,
+        }
+    }
+}
+
+impl structs::StoreFront {
+    pub fn into_model(
+        &self,
+        buying: Vec<structs::ItemInStore>,
+        selling: Vec<structs::ItemInStore>,
+    ) -> models::StoreFront {
+        let buying_map = buying.iter().map(|i| (i.into_model(), i.gold)).collect();
+        let selling_map = selling.iter().map(|i| (i.into_model(), i.gold)).collect();
+        models::StoreFront {
+            id: self.id,
+            buying: buying_map,
+            selling: selling_map,
+        }
+    }
+}
+
+impl structs::ItemInStore {
+    fn into_model(&self) -> models::Item {
+        match self.item_name.as_str() {
+            "stone" => models::Item::Stone,
+            _ => panic!("unsupported item: {}", self.item_name),
         }
     }
 }
