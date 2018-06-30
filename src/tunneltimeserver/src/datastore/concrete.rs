@@ -82,11 +82,17 @@ impl Datastore {
         let store_front = town.store_front.unwrap();
         let (buy_or_sell, price) = match action {
             models::StoreInteractionAction::Buy => {
-                let buying_price = store_front.buying.get(&item).unwrap();
+                let buying_price = store_front
+                    .buying
+                    .get(&item)
+                    .ok_or(error::Error::StoreDoesNotHaveItem(item))?;
                 (1, buying_price)
             }
             models::StoreInteractionAction::Sell => {
-                let selling_price = store_front.selling.get(&item).unwrap();
+                let selling_price = store_front
+                    .selling
+                    .get(&item)
+                    .ok_or(error::Error::StoreDoesNotHaveItem(item))?;
                 (-1, selling_price)
             }
         };
