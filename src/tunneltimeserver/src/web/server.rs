@@ -171,9 +171,9 @@ fn get_query_param<T: FromStr>(req: &Request, name: &str) -> Result<T, types::Re
     match params.get(name) {
         Some(val) => match val.parse() {
             Ok(v) => Ok(v),
-            Err(_) => Err(responses::bad_request("missing user_name")),
+            Err(_) => Err(responses::bad_request(format!("missing {}", name).as_str())),
         },
-        None => Err(responses::bad_request("missing user_name")),
+        None => Err(responses::bad_request(format!("missing {}", name).as_str())),
     }
 }
 
