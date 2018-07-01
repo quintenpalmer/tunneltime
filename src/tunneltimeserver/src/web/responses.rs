@@ -5,7 +5,7 @@ use hyper::header::ContentLength;
 use hyper::server::Response;
 use web::types;
 
-const ROUTE_NOT_FOUND: &'static str = "Route Not Found";
+const ROUTE_NOT_FOUND: &'static str = r#"{"message":"Route Not Found"}"#;
 
 pub fn path_not_found(path: &str) -> types::ResponseFuture {
     println!("{:?}", path);
@@ -17,7 +17,7 @@ pub fn path_not_found(path: &str) -> types::ResponseFuture {
     ))
 }
 
-const METHOD_NOT_ALLOWED: &'static str = "Method Not Allowed";
+const METHOD_NOT_ALLOWED: &'static str = r#"{"message":"Method Not Allowed"}"#;
 
 pub fn method_not_allowed(method: &hyper::Method) -> types::ResponseFuture {
     println!("{}", method);
@@ -29,7 +29,7 @@ pub fn method_not_allowed(method: &hyper::Method) -> types::ResponseFuture {
     ))
 }
 
-const BAD_REQUEST: &'static str = "Bad Request";
+const BAD_REQUEST: &'static str = r#"{"message":"Bad Request"}"#;
 
 pub fn bad_request(message: &str) -> types::ResponseFuture {
     println!("{}", message);

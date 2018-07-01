@@ -9,7 +9,7 @@ use futures::future::Future;
 
 pub type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 
-const ISE: &'static str = "Internal Server Error";
+const ISE: &'static str = r#"{"message":"Internal Server Error"}"#;
 
 pub fn five_hundred<T: fmt::Debug>(err: T) -> ResponseFuture {
     println!("{:?}", err);
