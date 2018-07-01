@@ -6,6 +6,8 @@ extern crate futures;
 extern crate hyper;
 extern crate tokio_core;
 
+use std::io::{self, Write};
+
 mod client;
 mod error;
 
@@ -17,9 +19,13 @@ fn main() {
 }
 
 fn run_app() -> Result<(), error::Error> {
-    let town = client::request_town()?;
+    io::stdout().write(b"enter your user id\n")?;
+    let mut buffer = String::new();
+    io::stdin().read_line(&mut buffer)?;
+    let town_id = buffer.trim().parse::<i32>()?;
+    let town = client::request_town(town_id)?;
     let town_buf = serde_json::to_string_pretty(&town)?;
-    let dwarves = client::request_dwarves()?;
+    let dwarves = client::request_dwarves(town.id)?;
     let dwarves_buf = serde_json::to_string_pretty(&dwarves)?;
     println!("Let's get digging!");
     println!("Your town:");
