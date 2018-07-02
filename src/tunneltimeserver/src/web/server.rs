@@ -84,14 +84,14 @@ fn handle_user_post(req: Request, ds: datastore::Datastore) -> types::ResponseFu
         let v: models::NewUser = isetry!(
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
-        let user = isetry!(ds.new_user(v.user_name));
+        let user = resulttry!(ds.new_user(v.user_name));
         build_response(user)
     }))
 }
 
 fn handle_town(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
     let user_id: i32 = rtry!(get_query_param(&req, "user_id"));
-    build_response(isetry!(ds.get_town(user_id)))
+    build_response(resulttry!(ds.get_town(user_id)))
 }
 
 fn handle_town_post(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
@@ -99,7 +99,7 @@ fn handle_town_post(req: Request, ds: datastore::Datastore) -> types::ResponseFu
         let v: models::UserID = isetry!(
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
-        let town = isetry!(ds.new_town(v.user_id));
+        let town = resulttry!(ds.new_town(v.user_id));
         build_response(town)
     }))
 }
@@ -110,7 +110,9 @@ fn handle_town_put(req: Request, ds: datastore::Datastore) -> types::ResponseFut
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
         let town = match v.town_action {
-            models::TownAction::PurchaseStoreFront => isetry!(ds.purchase_store_front(v.town_id)),
+            models::TownAction::PurchaseStoreFront => {
+                resulttry!(ds.purchase_store_front(v.town_id))
+            }
         };
         build_response(town)
     }))
@@ -118,7 +120,7 @@ fn handle_town_put(req: Request, ds: datastore::Datastore) -> types::ResponseFut
 
 fn handle_store_front(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
     let user_id: i32 = rtry!(get_query_param(&req, "user_id"));
-    build_response(isetry!(ds.get_store_front(user_id)))
+    build_response(resulttry!(ds.get_store_front(user_id)))
 }
 
 fn handle_store_front_put(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
@@ -126,14 +128,14 @@ fn handle_store_front_put(req: Request, ds: datastore::Datastore) -> types::Resp
         let v: models::StoreInteractionPayload = isetry!(
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
-        let town = isetry!(ds.purchase_item(v.town_id, v.action, v.item, v.count));
+        let town = resulttry!(ds.purchase_item(v.town_id, v.action, v.item, v.count));
         build_response(town)
     }))
 }
 
 fn handle_dwarves(req: &Request, ds: &datastore::Datastore) -> types::ResponseFuture {
     let town_id: i32 = rtry!(get_query_param(&req, "town_id"));
-    build_response(isetry!(ds.get_dwarves(town_id)))
+    build_response(resulttry!(ds.get_dwarves(town_id)))
 }
 
 fn handle_dwarves_post(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
@@ -141,7 +143,7 @@ fn handle_dwarves_post(req: Request, ds: datastore::Datastore) -> types::Respons
         let v: models::DwarfCreation = isetry!(
             serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
         );
-        let dwarf = isetry!(ds.recruit_dwarf(v.town_id, v.dwarf_name));
+        let dwarf = resulttry!(ds.recruit_dwarf(v.town_id, v.dwarf_name));
         build_response(dwarf)
     }))
 }
@@ -153,11 +155,11 @@ fn handle_dwarf_put(req: Request, ds: datastore::Datastore) -> types::ResponseFu
         );
         match v.action {
             models::DwarfAction::Dig => {
-                let dwarf = isetry!(ds.send_dwarf_digging(v.dwarf_id));
+                let dwarf = resulttry!(ds.send_dwarf_digging(v.dwarf_id));
                 build_response(dwarf)
             }
             models::DwarfAction::Retrieve => {
-                let dwarf = isetry!(ds.retrieve_dwarf(v.dwarf_id));
+                let dwarf = resulttry!(ds.retrieve_dwarf(v.dwarf_id));
                 build_response(dwarf)
             }
         }
