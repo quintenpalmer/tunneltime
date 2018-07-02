@@ -5,6 +5,18 @@ use hyper::header::ContentLength;
 use hyper::server::Response;
 use web::types;
 
+const RESOURCE_NOT_FOUND: &'static str = r#"{"message":"Resource Not Found"}"#;
+
+pub fn resource_not_found() -> types::ResponseFuture {
+    println!("resource not found");
+    Box::new(futures::future::ok(
+        Response::new()
+            .with_status(hyper::StatusCode::NotFound)
+            .with_header(ContentLength(RESOURCE_NOT_FOUND.len() as u64))
+            .with_body(RESOURCE_NOT_FOUND),
+    ))
+}
+
 const ROUTE_NOT_FOUND: &'static str = r#"{"message":"Route Not Found"}"#;
 
 pub fn path_not_found(path: &str) -> types::ResponseFuture {

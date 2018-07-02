@@ -75,7 +75,7 @@ fn handle_health() -> types::ResponseFuture {
 
 fn handle_user_get(req: Request, ds: &datastore::Datastore) -> types::ResponseFuture {
     let user_name: String = rtry!(get_query_param(&req, "user_name"));
-    let user = isetry!(ds.get_user(user_name.to_string()));
+    let user = resulttry!(ds.get_user(user_name.to_string()));
     build_response(user)
 }
 
