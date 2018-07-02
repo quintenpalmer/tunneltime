@@ -1,6 +1,7 @@
 use hyper;
 use serde_json;
 use std::io;
+use std::num;
 
 #[derive(Debug)]
 pub enum Error {
@@ -8,6 +9,7 @@ pub enum Error {
     IO(io::Error),
     HyperURI(hyper::error::UriError),
     Hyper(hyper::Error),
+    ParseIntError(num::ParseIntError),
 }
 
 impl From<serde_json::Error> for Error {
@@ -31,5 +33,11 @@ impl From<hyper::Error> for Error {
 impl From<hyper::error::UriError> for Error {
     fn from(error: hyper::error::UriError) -> Self {
         Error::HyperURI(error)
+    }
+}
+
+impl From<num::ParseIntError> for Error {
+    fn from(error: num::ParseIntError) -> Self {
+        Error::ParseIntError(error)
     }
 }
