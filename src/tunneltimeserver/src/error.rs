@@ -15,10 +15,21 @@ pub enum Error {
     PostgresExtra(pg_extra::ExtraError),
     NoSqlRows,
     SelectManyOnOne(String),
+    AppSpecific(AppSpecificError),
+}
+
+#[derive(Debug)]
+pub enum AppSpecificError {
     DwarfBusy(i32),
     DwarfNotReturned(i32),
     StoreFrontNotPurchased(i32),
     StoreDoesNotHaveItem(models::Item),
+}
+
+impl From<AppSpecificError> for Error {
+    fn from(error: AppSpecificError) -> Self {
+        Error::AppSpecific(error)
+    }
 }
 
 impl From<serde_json::Error> for Error {

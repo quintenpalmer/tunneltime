@@ -80,20 +80,20 @@ impl Datastore {
         let txn = self.conn.transaction()?;
         let town = get_town_by_town_id(&txn, town_id)?;
         let store_front = town.store_front
-            .ok_or(error::Error::StoreFrontNotPurchased(town_id))?;
+            .ok_or(error::AppSpecificError::StoreFrontNotPurchased(town_id))?;
         let (buy_or_sell, price) = match action {
             models::StoreInteractionAction::Buy => {
                 let buying_price = store_front
                     .buying
                     .get(&item)
-                    .ok_or(error::Error::StoreDoesNotHaveItem(item))?;
+                    .ok_or(error::AppSpecificError::StoreDoesNotHaveItem(item))?;
                 (1, buying_price)
             }
             models::StoreInteractionAction::Sell => {
                 let selling_price = store_front
                     .selling
                     .get(&item)
-                    .ok_or(error::Error::StoreDoesNotHaveItem(item))?;
+                    .ok_or(error::AppSpecificError::StoreDoesNotHaveItem(item))?;
                 (-1, selling_price)
             }
         };
@@ -147,8 +147,16 @@ impl Datastore {
         let dwarf = get_dwarf(&txn, dwarf_id)?;
         match dwarf.status {
             models::DwarfStatus::Free => (),
-            models::DwarfStatus::Digging => return Err(error::Error::DwarfBusy(dwarf_id)),
-            models::DwarfStatus::Returned => return Err(error::Error::DwarfBusy(dwarf_id)),
+            models::DwarfStatus::Digging => {
+                return Err(error::Error::AppSpecific(
+                    error::AppSpecificError::DwarfBusy(dwarf_id),
+                ))
+            }
+            models::DwarfStatus::Returned => {
+                return Err(error::Error::AppSpecific(
+                    error::AppSpecificError::DwarfBusy(dwarf_id),
+                ))
+            }
         };
         let mine = get_mine(&txn, dwarf.town_id)?;
         txn.execute(queries::SEND_DWARF_DIGGING, &[&dwarf.id, &mine.id])?;
@@ -162,8 +170,16 @@ impl Datastore {
         let txn = self.conn.transaction()?;
         let dwarf = get_dwarf(&txn, dwarf_id)?;
         match dwarf.status {
-            models::DwarfStatus::Free => return Err(error::Error::DwarfNotReturned(dwarf_id)),
-            models::DwarfStatus::Digging => return Err(error::Error::DwarfNotReturned(dwarf_id)),
+            models::DwarfStatus::Free => {
+                return Err(error::Error::AppSpecific(
+                    error::AppSpecificError::DwarfNotReturned(dwarf_id),
+                ))
+            }
+            models::DwarfStatus::Digging => {
+                return Err(error::Error::AppSpecific(
+                    error::AppSpecificError::DwarfNotReturned(dwarf_id),
+                ))
+            }
             models::DwarfStatus::Returned => (),
         };
         let mine = get_mine(&txn, dwarf.town_id)?;
