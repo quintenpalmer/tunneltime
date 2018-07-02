@@ -14,10 +14,11 @@ where
     F: pg::types::ToSql,
 {
     let rows = ds.query(query, &[&id])?;
-    if rows.len() != 1 {
-        return Err(error::Error::SelectManyOnOne(name));
-    }
-    let row = rows.get(0);
+    let row = match rows.len() {
+        0 => Err(error::Error::NoSqlRows),
+        1 => Ok(rows.get(0)),
+        _ => Err(error::Error::SelectManyOnOne(name)),
+    }?;
     let ret = T::parse_row(row)?;
     Ok(ret)
 }
