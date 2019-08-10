@@ -9,6 +9,7 @@ extern crate tokio_core;
 use std::io::{self, Write};
 
 mod client;
+mod draw;
 mod error;
 
 fn main() {
@@ -31,5 +32,12 @@ fn run_app() -> Result<(), error::Error> {
     println!("Your town:");
     println!("{}", town_buf);
     println!("{}", dwarves_buf);
+    println!(
+        "test: {}",
+        draw::draw_table(vec![draw::Row {
+            header: "name".to_string(),
+            columns: vec![]
+        }])
+    );
     return Ok(());
 }
