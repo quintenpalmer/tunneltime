@@ -17,7 +17,8 @@ pub static SIMPLE_TOWN_BY_USER_ID: &'static str = r#"
 "#;
 
 macro_rules! town_base_sql {
-    () => ( r#"
+    () => {
+        r#"
     SELECT
         towns.id as town_id,
         towns.user_id,
@@ -35,7 +36,8 @@ macro_rules! town_base_sql {
         storage_buildings ON storage_buildings.town_id = towns.id
     INNER JOIN
         storage_building_levels ON storage_buildings.level = storage_building_levels.level
-"# )
+"#
+    };
 }
 
 pub static TOWN_BY_USER_ID_SQL: &'static str = concat!(town_base_sql!(), "WHERE user_id = $1");

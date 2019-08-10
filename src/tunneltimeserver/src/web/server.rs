@@ -105,17 +105,19 @@ fn handle_town_post(req: Request, ds: datastore::Datastore) -> types::ResponseFu
 }
 
 fn handle_town_put(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
-    Box::new(req.body().concat2().and_then(move |chunk| {
-        let v: models::TownPut = isetry!(
-            serde_json::from_slice(&chunk).map_err(|e| io::Error::new(io::ErrorKind::Other, e))
-        );
-        let town = match v.town_action {
-            models::TownAction::PurchaseStoreFront => {
-                resulttry!(ds.purchase_store_front(v.town_id))
-            }
-        };
-        build_response(town)
-    }))
+    Box::new(
+        req.body().concat2().and_then(move |chunk| {
+            let v: models::TownPut =
+                isetry!(serde_json::from_slice(&chunk)
+                    .map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
+            let town = match v.town_action {
+                models::TownAction::PurchaseStoreFront => {
+                    resulttry!(ds.purchase_store_front(v.town_id))
+                }
+            };
+            build_response(town)
+        }),
+    )
 }
 
 fn handle_store_front(req: Request, ds: datastore::Datastore) -> types::ResponseFuture {
